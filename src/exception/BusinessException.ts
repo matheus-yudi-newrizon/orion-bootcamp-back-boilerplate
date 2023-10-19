@@ -1,11 +1,11 @@
 /**
- * Classe que representa uma exceção personalizada para violações das regras de negócio.
+ * Class representing a custom exception for business rule violations.
  */
 export class BusinessException extends Error {
   /**
-   * Cria uma nova instância da classe `BusinessException` com a mensagem de erro especificada.
+   * Creates a new instance of the `BusinessException` class with the specified error message.
    *
-   * @param message Uma mensagem descritiva da violação da regra de negócio.
+   * @param message A descriptive message of the business rule violation.
    */
   constructor(message: string) {
     super(message);

@@ -1,13 +1,13 @@
 import { BusinessException } from './BusinessException';
 
 /**
- * Classe que representa uma exceção personalizada para violações de campos obrigatórios no corpo das requisições.
+ * Class representing a custom exception for violations of required fields in request bodies.
  */
 export class RequiredFieldException extends BusinessException {
   /**
-   * Cria uma nova instância da classe `RequiredFieldException` com uma mensagem de erro específica.
+   * Creates a new instance of the `RequiredFieldException` class with a specific error message.
    *
-   * @param field O nome do campo obrigatório que não foi informado.
+   * @param field The name of the required field that was not provided.
    */
   constructor(field: string) {
     super(`Required field: ${field}`);

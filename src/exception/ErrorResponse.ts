@@ -1,38 +1,38 @@
 import { Request } from 'express';
 
 /**
- * Classe para representar mensagens de erro HTTP personalizadas.
+ * Class to represent custom HTTP error messages.
  */
 export class ErrorResponse {
   /**
-   * O código de status HTTP da resposta de erro.
+   * The HTTP status code of the error response.
    * @type {number}
    */
   private status: number;
 
   /**
-   * O método HTTP da solicitação.
+   * The HTTP method of the request.
    * @type {string}
    */
   private httpMethod: string;
 
   /**
-   * A URI original da solicitação.
+   * The original URI of the request.
    * @type {string}
    */
   private uri: string;
 
   /**
-   * A mensagem de erro associada à resposta de erro.
+   * The error message associated with the error response.
    * @type {string}
    */
   private message: string;
 
   /**
-   * Cria uma instância da classe ErrorResponse.
+   * Creates an instance of the ErrorResponse class.
    *
-   * @param {Request} request - O objeto da requisição HTTP que gerou erro.
-   * @param {string} message - A mensagem de erro a ser associada.
+   * @param {Request} request - The HTTP request object that generated the error.
+   * @param {string} message - The error message to be associated.
    */
   constructor(request: Request, message: string) {
     this.status = 400;
