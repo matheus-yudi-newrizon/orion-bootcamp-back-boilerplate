@@ -3,13 +3,9 @@ import { MysqlDataSource } from '../config/database';
 import { User } from '../entity/User';
 
 export class UserService {
-  private userRepository: Repository<User>;
+  private static userRepository: Repository<User> = MysqlDataSource.getRepository(User);
 
-  constructor() {
-    this.userRepository = MysqlDataSource.getRepository(User);
-  }
-
-  async createUser(email: string, password: string): Promise<User> {
+  public static async createUser(email: string, password: string): Promise<User> {
     const usuario = new User();
     usuario.email = email;
     usuario.password = password;
