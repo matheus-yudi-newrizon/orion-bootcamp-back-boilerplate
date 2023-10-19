@@ -5,7 +5,7 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
     openapi: '3.0.0',
     info: {
       title: 'Review Reveal API',
-      description: 'Documentação da API do projeto Review Reveal.',
+      description: 'Review Reveal API documentation.',
       version: '1.0.0'
     },
     host: 'localhost:4444',

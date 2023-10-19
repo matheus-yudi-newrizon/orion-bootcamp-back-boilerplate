@@ -1,7 +1,7 @@
 {
   "name": "review-reveal-api",
   "version": "1.0.0",
-  "description": "Boilerplate para as APIs do Orion Bootcamp",
+  "description": "Boilerplate for Orion Bootcamp APIs",
   "author": "",
   "license": "ISC",
   "scripts": {
