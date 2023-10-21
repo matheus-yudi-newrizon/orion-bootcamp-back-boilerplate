@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { BusinessException } from './BusinessException';
 
 /**
  * Class to represent custom HTTP error messages.
@@ -32,12 +33,12 @@ export class ErrorResponse {
    * Creates an instance of the ErrorResponse class.
    *
    * @param {Request} request - The HTTP request object that generated the error.
-   * @param {string} message - The error message to be associated.
+   * @param {BusinessException} exception - The `BusinessException` instance containing details of the error.
    */
-  constructor(request: Request, message: string) {
-    this.status = 400;
+  constructor(request: Request, exception: BusinessException) {
+    this.status = exception.status;
     this.httpMethod = request.method;
     this.uri = request.originalUrl;
-    this.message = message;
+    this.message = exception.message;
   }
 }

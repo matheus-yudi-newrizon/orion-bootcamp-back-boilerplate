@@ -11,6 +11,7 @@ export class RequiredFieldException extends BusinessException {
    */
   constructor(field: string) {
     super(`Required field: ${field}`);
+    this.status = 400;
     this.name = 'RequiredFieldException';
   }
 }
