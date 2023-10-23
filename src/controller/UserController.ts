@@ -1,18 +1,23 @@
 import { Request, Response } from 'express';
+import { UserService } from 'service/UserService';
 
 /**
  * Controller for the user registration route.
  */
-export class UserController {
+export class CadastroController {
+
   async signup(req: Request, res: Response) {
     try {
-      // TODO: Implement the logic for handling user registration.
-      const message = 'Esta é a página de cadastro';
-      res.status(200).json({ message });
+      const { email, password, confirmPassword } = req.body;
+  
+      const newUser = await UserService.createUser(email, password, confirmPassword);
+  
+      res.status(201).json({ message: 'Usuário criado com sucesso', user: newUser });
     } catch (error) {
-      res.status(500).json({ error: 'Erro ao processar a solicitação.' });
+      res.status(400).json({ error: 'Erro ao criar o usuário', details: error.message });
     }
   }
+
 }
 
-export default UserController;
+export default CadastroController;
