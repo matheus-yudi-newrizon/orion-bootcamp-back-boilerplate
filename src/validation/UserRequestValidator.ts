@@ -21,23 +21,15 @@ export class UserRequestValidator {
    * Validates the strength of a user's password.
    * @param password - The password to be validated.
    * @throws {PasswordNotValidException} - Throws an exception if the password does not meet security criteria.
+   *  @throws {Error} - Throws an error if the passwords do not match.
    */
-  public static validateUserPassword(password: string): void {
+  public static validateUserPassword(password: string, confirmPassword: string): void {
     const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$/;
 
     if (!passwordPattern.test(password)) {
       throw new PasswordNotValidException();
     }
-  }
 
-  /**
-   * Validates that the provided password and confirm password match.
-   * @param password - The password to be compared.
-   * @param confirmPassword - The confirmation password to be compared.
-   * @throws {Error} - Throws an error if the passwords do not match.
-   */
-
-  public static validateUserPasswordAndConfirmPassword(password: string, confirmPassword: string): void {
     if (password !== confirmPassword) {
       throw new PasswordMismatchException();
     }

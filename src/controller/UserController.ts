@@ -16,8 +16,7 @@ export class UserController {
       if (!confirmPassword) throw new RequiredFieldException('confirmPassword');
 
       UserRequestValidator.validateUserEmail(email);
-      UserRequestValidator.validateUserPassword(password);
-      UserRequestValidator.validateUserPasswordAndConfirmPassword(password, confirmPassword);
+      UserRequestValidator.validateUserPassword(password, confirmPassword);
 
       const user = await UserService.createUser(email, password, confirmPassword);
       return res.status(201).json(user);
