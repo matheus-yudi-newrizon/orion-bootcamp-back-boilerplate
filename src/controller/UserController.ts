@@ -12,10 +12,15 @@ export class UserController {
   
       const newUser = await UserService.createUser(email, password, confirmPassword);
   
-      res.status(201).json({ message: 'Usuário criado com sucesso', user: newUser });
+      res.status(201).json({ message: 'User created successfully', user: newUser });
     } catch (error) {
-      res.status(400).json({ error: 'Erro ao criar o usuário', details: error.message });
+      if (error.statusCode) {
+        res.status(error.statusCode).json({ error: 'Request processing error.', details: error.message });
+      } else {
+        res.status(500).json({ error: 'Internal server error.' });
+      }
     }
+    
   }
 
 }
