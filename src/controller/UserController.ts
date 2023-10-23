@@ -4,7 +4,7 @@ import { UserService } from 'service/UserService';
 /**
  * Controller for the user registration route.
  */
-export class CadastroController {
+export class UserController {
 
   async signup(req: Request, res: Response) {
     try {
@@ -20,4 +20,4 @@ export class CadastroController {
 
 }
 
-export default CadastroController;
+export default UserController;
