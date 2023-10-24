@@ -1,10 +1,13 @@
 import { Repository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { User } from '../entity/User';
+import { PasswordEncrypt } from '../security/PasswordEncrypt';
+import { UserAlreadyExistsException } from '../exception/UserAlreadyExistsException';
+import { DatabaseOperationFailException } from '../exception/DatabaseOperationFailException';
+import { UserResponseDTO } from '../dto/UserResponseDTO';
 
 export class UserService {
-  private static userRepository: Repository<User> =
-    MysqlDataSource.getRepository(User);
+  private static userRepository: Repository<User> = MysqlDataSource.getRepository(User);
 
   /**
    * Creates a new user with the provided email and password. It ensures that
@@ -12,24 +15,21 @@ export class UserService {
    *
    * @param email - The user's email.
    * @param password - The user's password.
-   * @param confirmPassword - The password confirmation to ensure it matches the password.
    *
    * @returns A promise that resolves with the created user.
    * @throws An error if the password and confirmation password do not match.
    */
-  public static async createUser(
-    email: string,
-    password: string,
-    confirmPassword: string
-  ): Promise<User> {
-    if (password !== confirmPassword) {
-      throw new Error('Passwords do not match');
+  public static async createUser(email: string, password: string): Promise<UserResponseDTO> {
+    const existsUserByEmail = await this.userRepository.findOne({ where: { email } });
+    if (existsUserByEmail) throw new UserAlreadyExistsException(email);
+
+    const passwordEncrypted = await PasswordEncrypt.encrypt(password);
+
+    try {
+      const user = await this.userRepository.save({ email, password: passwordEncrypted });
+      return new UserResponseDTO(user);
+    } catch (error) {
+      throw new DatabaseOperationFailException();
     }
-
-    const usuario = new User();
-    usuario.email = email;
-    usuario.password = password;
-
-    return this.userRepository.save(usuario);
   }
 }
