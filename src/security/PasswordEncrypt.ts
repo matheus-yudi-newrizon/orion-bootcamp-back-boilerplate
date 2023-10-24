@@ -1,4 +1,3 @@
-// import * as bcrypt from 'bcrypt';
 import bcrypt from 'bcrypt';
 
 export class PasswordEncrypt {
@@ -9,7 +8,7 @@ export class PasswordEncrypt {
    * @returns A promise that resolves with the hashed password.
    */
   public static async encrypt(password: string): Promise<string> {
-    const saltRounds = 10; // Número de rounds para a criptografia
+    const saltRounds = 10;
     return bcrypt.hash(password, saltRounds);
   }
 
