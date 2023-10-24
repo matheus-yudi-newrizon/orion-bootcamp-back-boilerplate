@@ -7,6 +7,7 @@ import { RequiredFieldException } from '../exception/RequiredFieldException';
  * Controller for the user registration route.
  */
 export class UserController {
+
   async signup(req: Request, res: Response) {
     try {
       const { email, password, confirmPassword } = req.body;
@@ -18,12 +19,19 @@ export class UserController {
       UserRequestValidator.validateUserEmail(email);
       UserRequestValidator.validateUserPassword(password, confirmPassword);
 
-      const user = await UserService.createUser(email, password, confirmPassword);
-      return res.status(201).json(user);
+      const newUser = await UserService.createUser(email, password, confirmPassword);
+  
+      res.status(201).json({ message: 'User created successfully', user: newUser });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      if (error.statusCode) {
+        res.status(error.statusCode).json({ error: 'Request processing error.', details: error.message });
+      } else {
+        res.status(500).json({ error: 'Internal server error.' });
+      }
     }
+    
   }
+
 }
 
 export default UserController;
