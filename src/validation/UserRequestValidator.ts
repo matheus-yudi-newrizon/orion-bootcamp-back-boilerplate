@@ -1,6 +1,6 @@
 import { PasswordNotValidException } from '../exception/PasswordNotValidException';
 import { EmailNotValidException } from '../exception/EmailNotValidException';
-import { PasswordMismatchException } from 'exception/PasswordMismatchException';
+import { PasswordMismatchException } from '../exception/PasswordMismatchException';
 /**
  * Class for user request validation.
  */
@@ -11,7 +11,7 @@ export class UserRequestValidator {
    * @throws {EmailNotValidException} - Throws an exception if the email is not in the correct format.
    */
   public static validateUserEmail(email: string): void {
-    const emailPattern = /^[A-Za-z0-9.%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$/;
+    const emailPattern = /^[A-Za-z0-9.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!emailPattern.test(email)) {
       throw new EmailNotValidException();
     }
