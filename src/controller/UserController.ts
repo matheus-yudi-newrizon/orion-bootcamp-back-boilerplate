@@ -8,7 +8,7 @@ import { RequiredFieldException } from '../exception/RequiredFieldException';
  */
 export class UserController {
 
-  async signup(req: Request, res: Response) {
+  static async signup(req: Request, res: Response) {
     try {
       const { email, password, confirmPassword } = req.body;
 
@@ -29,9 +29,7 @@ export class UserController {
         res.status(500).json({ error: 'Internal server error.' });
       }
     }
-    
   }
-
 }
 
 export default UserController;

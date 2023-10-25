@@ -3,8 +3,7 @@ import { MysqlDataSource } from '../config/database';
 import { User } from '../entity/User';
 
 export class UserService {
-  private static userRepository: Repository<User> =
-    MysqlDataSource.getRepository(User);
+  private static userRepository: Repository<User> = MysqlDataSource.getRepository(User);
 
   /**
    * Creates a new user with the provided email and password. It ensures that
@@ -17,11 +16,7 @@ export class UserService {
    * @returns A promise that resolves with the created user.
    * @throws An error if the password and confirmation password do not match.
    */
-  public static async createUser(
-    email: string,
-    password: string,
-    confirmPassword: string
-  ): Promise<User> {
+  public static async createUser(email: string, password: string, confirmPassword: string): Promise<User> {
     if (password !== confirmPassword) {
       throw new Error('Passwords do not match');
     }
