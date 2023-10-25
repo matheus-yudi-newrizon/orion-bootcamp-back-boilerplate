@@ -2,13 +2,61 @@ import { Request, Response } from 'express';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 import { RequiredFieldException } from '../exception/RequiredFieldException';
+import { IControllerResponse } from '../interface/IControllerResponse';
+import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { BusinessException } from '../exception/BusinessException';
 
-/**
- * Controller for the user registration route.
- */
 export class UserController {
+  /**
+   * @swagger
+   * /signup:
+   *   post:
+   *     summary: Register user data.
+   *     tags: [Sign up]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
+   *     responses:
+   *       '201':
+   *           description: Returns the user created in the database.
+   *           content:
+   *             application/json:
+   *               schema:
+   *                 type: object
+   *                 properties:
+   *                   success:
+   *                     type: boolean
+   *                   data:
+   *                     type: object
+   *                     properties:
+   *                       id:
+   *                         type: integer
+   *                       email:
+   *                         type: string
+   *                 example:
+   *                   success: true
+   *                   data:
+   *                     id: 1
+   *                     email: orion.bootcamp@email.com
+   *       '400':
+   *           description: Returns error (Password mismatch).
+   *           content:
+   *             application/json:
+   *               schema:
+   *                 type: object
+   *                 properties:
+   *                   success:
+   *                     type: boolean
+   *                   message:
+   *                     type: string
+   *                 example:
+   *                   success: false
+   *                   message: PasswordMismatchException. The provided password does not match the confirmation password.
+   */
+  static async signup(req: Request, res: Response): Promise<void> {
+    const result: IControllerResponse<UserResponseDTO> = {} as IControllerResponse<UserResponseDTO>;
 
-  static async signup(req: Request, res: Response) {
     try {
       const { email, password, confirmPassword } = req.body;
 
@@ -19,17 +67,21 @@ export class UserController {
       UserRequestValidator.validateUserEmail(email);
       UserRequestValidator.validateUserPassword(password, confirmPassword);
 
-      const newUser = await UserService.createUser(email, password, confirmPassword);
-  
-      res.status(201).json({ message: 'User created successfully', user: newUser });
+      const user: UserResponseDTO = await UserService.createUser(email, password);
+      result.success = true;
+      result.message = 'User created successfully';
+      result.data = user;
+
+      res.status(201).json(result);
     } catch (error) {
-      if (error.statusCode) {
-        res.status(error.statusCode).json({ error: 'Request processing error.', details: error.message });
+      result.success = false;
+      result.message = `${error.name}. ${error.message}`;
+
+      if (error instanceof BusinessException) {
+        res.status(error.status).json(result);
       } else {
-        res.status(500).json({ error: 'Internal server error.' });
+        res.status(500).json(result);
       }
     }
   }
 }
-
-export default UserController;
