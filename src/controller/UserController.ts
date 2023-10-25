@@ -2,8 +2,9 @@ import { Request, Response } from 'express';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 import { RequiredFieldException } from '../exception/RequiredFieldException';
-import { IControllerResponse } from 'interface/IControllerResponse';
-import { UserResponseDTO } from 'dto/UserResponseDTO';
+import { IControllerResponse } from '../interface/IControllerResponse';
+import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { BusinessException } from '../exception/BusinessException';
 
 export class UserController {
   /**
@@ -76,7 +77,11 @@ export class UserController {
       result.success = false;
       result.message = `${error.name}. ${error.message}`;
 
-      res.status(error.status).json(result);
+      if (error instanceof BusinessException) {
+        res.status(error.status).json(result);
+      } else {
+        res.status(500).json(result);
+      }
     }
   }
 }
