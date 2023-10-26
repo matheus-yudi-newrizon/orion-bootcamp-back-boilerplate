@@ -1,35 +1,29 @@
-import { Repository } from 'typeorm';
-import { MysqlDataSource } from '../config/database';
-import { User } from '../entity/User';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
 import { UserAlreadyExistsException } from '../exception/UserAlreadyExistsException';
-import { DatabaseOperationFailException } from '../exception/DatabaseOperationFailException';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { UserRepository } from '../repository/UserRepository';
+import { UserPostRequestDTO } from '../dto/UserPostRequestDTO';
 
 export class UserService {
-  private static userRepository: Repository<User> = MysqlDataSource.getRepository(User);
-
   /**
-   * Creates a new user with the provided email and password. It ensures that
-   * the password and the confirmation password match before creating the user.
+   * Creates a new user with the provided email and password.
    *
-   * @param email - The user's email.
-   * @param password - The user's password.
+   * @param userDTO - The user data including email and password.
    *
    * @returns A promise that resolves with the created user.
-   * @throws An error if the password and confirmation password do not match.
+   * @throws {UserAlreadyExistsException} if the user already exists.
+   * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
-  public static async createUser(email: string, password: string): Promise<UserResponseDTO> {
-    const existsUserByEmail = await this.userRepository.findOne({ where: { email } });
-    if (existsUserByEmail) throw new UserAlreadyExistsException(email);
+  public static async createUser(userDTO: UserPostRequestDTO): Promise<UserResponseDTO> {
+    const userByEmail = await UserRepository.getByEmail(userDTO.email);
+    if (userByEmail) throw new UserAlreadyExistsException(userDTO.email);
 
-    const passwordEncrypted = await PasswordEncrypt.encrypt(password);
+    const passwordEncrypted = await PasswordEncrypt.encrypt(userDTO.password);
+    userDTO.password = passwordEncrypted;
 
-    try {
-      const user = await this.userRepository.save({ email, password: passwordEncrypted });
-      return new UserResponseDTO(user);
-    } catch (error) {
-      throw new DatabaseOperationFailException();
-    }
+    const user = UserRepository.create(userDTO);
+    await UserRepository.save(user);
+
+    return new UserResponseDTO(user);
   }
 }
