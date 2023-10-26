@@ -19,7 +19,7 @@ export class UserController {
    *       - application/json
    *     responses:
    *       '201':
-   *           description: Returns the user created in database.
+   *           description: Returns the user created in the database.
    *           content:
    *             application/json:
    *               schema:
@@ -85,5 +85,3 @@ export class UserController {
     }
   }
 }
-
-export default UserController;
