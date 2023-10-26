@@ -5,6 +5,7 @@ import { RequiredFieldException } from '../exception/RequiredFieldException';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException } from '../exception/BusinessException';
+import { UserPostRequestDTO } from '../dto/UserPostRequestDTO';
 
 export class UserController {
   /**
@@ -58,24 +59,25 @@ export class UserController {
     const result: IControllerResponse<UserResponseDTO> = {} as IControllerResponse<UserResponseDTO>;
 
     try {
-      const { email, password, confirmPassword } = req.body;
+      const userPostRequest: UserPostRequestDTO = req.body;
+      const confirmPassword = req.body.confirmPassword;
 
-      if (!email) throw new RequiredFieldException('email');
-      if (!password) throw new RequiredFieldException('password');
+      if (!userPostRequest.email) throw new RequiredFieldException('email');
+      if (!userPostRequest.password) throw new RequiredFieldException('password');
       if (!confirmPassword) throw new RequiredFieldException('confirmPassword');
 
-      UserRequestValidator.validateUserEmail(email);
-      UserRequestValidator.validateUserPassword(password, confirmPassword);
+      UserRequestValidator.validateUserEmail(userPostRequest.email);
+      UserRequestValidator.validateUserPassword(userPostRequest.password, confirmPassword);
 
-      const user: UserResponseDTO = await UserService.createUser(email, password);
+      const userResponse: UserResponseDTO = await UserService.createUser(userPostRequest);
       result.success = true;
       result.message = 'User created successfully';
-      result.data = user;
+      result.data = userResponse;
 
       res.status(201).json(result);
     } catch (error) {
       result.success = false;
-      result.message = `${error.name}. ${error.message}`;
+      result.message = `${error.name}: ${error.message}`;
 
       if (error instanceof BusinessException) {
         res.status(error.status).json(result);
