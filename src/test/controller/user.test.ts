@@ -121,7 +121,7 @@ describe('UserController', () => {
       });
     });
 
-    it('should return 500 and DataBaseOperationFailException', async () => {
+    it('should return 500 and DatabaseOperationFailException', async () => {
       jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
       jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
       jest.spyOn(UserService, 'createUser').mockImplementationOnce(() => {
@@ -131,7 +131,26 @@ describe('UserController', () => {
       const response = await request(app).post('/signup').send(userInput());
 
       expect(response.statusCode).toBe(500);
-      expect(response.body.success).toBe(false);
+      expect(response.body).toEqual({
+        success: false,
+        message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+      });
+    });
+
+    it('should return 500 and Error', async () => {
+      jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
+      jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
+      jest.spyOn(UserService, 'createUser').mockImplementationOnce(() => {
+        throw new Error('Internal Server Error.');
+      });
+
+      const response = await request(app).post('/signup').send(userInput());
+
+      expect(response.statusCode).toBe(500);
+      expect(response.body).toEqual({
+        success: false,
+        message: 'Error. Internal Server Error.'
+      });
     });
   });
 });
