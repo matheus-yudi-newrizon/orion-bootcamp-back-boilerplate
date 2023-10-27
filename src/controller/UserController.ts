@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
+import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { BusinessException } from '../exception/BusinessException';
+import { RequiredFieldException } from '../exception/RequiredFieldException';
+import { IControllerResponse } from '../interface/IControllerResponse';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { UserResponseDTO } from '../dto/UserResponseDTO';
-import { BusinessException, RequiredFieldException } from '../exception';
 
 export class UserController {
   /**
@@ -84,3 +85,5 @@ export class UserController {
     }
   }
 }
+
+export default UserController;
