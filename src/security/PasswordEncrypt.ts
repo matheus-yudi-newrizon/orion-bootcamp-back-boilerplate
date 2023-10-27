@@ -9,7 +9,7 @@ export class PasswordEncrypt {
    */
   public static async encrypt(password: string): Promise<string> {
     const saltRounds = 10;
-    return bcrypt.hash(password, saltRounds);
+    return await bcrypt.hash(password, saltRounds);
   }
 
   /**
@@ -20,6 +20,6 @@ export class PasswordEncrypt {
    * @returns A promise that resolves with a boolean indicating if the passwords match.
    */
   public static async compare(password: string, hashedPassword: string): Promise<boolean> {
-    return bcrypt.compare(password, hashedPassword);
+    return await bcrypt.compare(password, hashedPassword);
   }
 }

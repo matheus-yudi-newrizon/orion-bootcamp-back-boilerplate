@@ -1,10 +1,12 @@
-import { DeepPartial, Repository } from 'typeorm';
+import { Service as Repository } from 'typedi';
+import { DeepPartial, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { User } from '../entity/User';
-import { DatabaseOperationFailException } from '../exception/DatabaseOperationFailException';
+import { DatabaseOperationFailException } from '../exception';
 
+@Repository()
 export class UserRepository {
-  private static ormRepository: Repository<User> = MysqlDataSource.getRepository(User);
+  private ormRepository: TypeOrmRepository<User> = MysqlDataSource.getRepository(User);
 
   /**
    * Saves a given user in the database.
@@ -14,7 +16,7 @@ export class UserRepository {
    * @returns A promise that resolves with the saved or updated user.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
-  public static async save(user: User): Promise<User> {
+  public async save(user: User): Promise<User> {
     try {
       return await this.ormRepository.save(user);
     } catch (error) {
@@ -30,10 +32,9 @@ export class UserRepository {
    * @returns A promise that resolves with the user if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
-  public static async getByEmail(email: string): Promise<User | null> {
+  public async getByEmail(email: string): Promise<User | null> {
     try {
-      const user = await this.ormRepository.findOne({ where: { email } });
-      return user;
+      return await this.ormRepository.findOne({ where: { email } });
     } catch (error) {
       throw new DatabaseOperationFailException();
     }
@@ -47,7 +48,7 @@ export class UserRepository {
    * @returns A new user instance with copied properties.
    * @throws {DatabaseOperationFailException} If the operation fails.
    */
-  public static create(entityLike: DeepPartial<User>): User {
+  public create(entityLike: DeepPartial<User>): User {
     try {
       return this.ormRepository.create(entityLike);
     } catch (error) {
