@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { UserService } from '../service/UserService';
-import { UserResponseDTO } from '../dto/UserResponseDTO';
-import { BusinessException } from '../exception/BusinessException';
+import { UserRequestValidator } from '../validation/UserRequestValidator';
 import { RequiredFieldException } from '../exception/RequiredFieldException';
 import { IControllerResponse } from '../interface/IControllerResponse';
-import { UserRequestValidator } from '../validation/UserRequestValidator';
+import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { BusinessException } from '../exception/BusinessException';
 
 export class UserController {
   /**
