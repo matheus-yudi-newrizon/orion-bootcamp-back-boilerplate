@@ -1,4 +1,4 @@
-import { UserResponseDTO } from '../../dto/UserResponseDTO';
+import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
 
 /**
  * Generates a mock of user input.
@@ -7,6 +7,15 @@ import { UserResponseDTO } from '../../dto/UserResponseDTO';
  */
 export const userInput = () => {
   return { email: 'orion@email.com', password: '12345678aA!', confirmPassword: '12345678aA!' };
+};
+
+/**
+ * Generates a mock of user post request.
+ *
+ * @returns A UserPostRequestDTO with the mocked data.
+ */
+export const userPostRequest = () => {
+  return { email: 'orion@email.com', password: '12345678aA!' };
 };
 
 /**
