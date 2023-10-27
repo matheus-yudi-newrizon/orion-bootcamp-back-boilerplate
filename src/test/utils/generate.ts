@@ -12,7 +12,7 @@ export const userInput = () => {
 /**
  * Generates a mock of user payload.
  *
- * @returns An object with the mocked data.
+ * @returns A UserResponseDTO with the mocked data.
  */
 export const userPayload = () => {
   return new UserResponseDTO({ id: 1, email: 'orion@email.com', password: '12345678aA!' });

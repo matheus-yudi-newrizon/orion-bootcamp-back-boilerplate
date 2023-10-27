@@ -3,6 +3,7 @@ import request from 'supertest';
 import routes from '../routes';
 
 const app = express();
+app.use(express.json());
 app.use(routes);
 
 describe('GET /ping', () => {
