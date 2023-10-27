@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
+import { UserService } from '../service/UserService';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException } from '../exception/BusinessException';
 import { RequiredFieldException } from '../exception/RequiredFieldException';
 import { IControllerResponse } from '../interface/IControllerResponse';
-import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
 export class UserController {
