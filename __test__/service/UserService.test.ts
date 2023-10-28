@@ -1,4 +1,7 @@
 import { Container } from 'typedi';
+import { UserPostRequestDTO } from '../../src/dto/UserPostRequestDTO';
+import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
+import { User } from '../../src/entity/User';
 import { UserAlreadyExistsException } from '../../src/exception';
 import { UserRepository } from '../../src/repository/UserRepository';
 import { UserService } from '../../src/service/UserService';
@@ -11,10 +14,13 @@ describe('UserService', () => {
     beforeEach(() => {
       jest.clearAllMocks();
 
-      const user = {
+      const user: User = {
         id: 1,
         email: 'test@example.com',
-        password: 'testpassword'
+        password: 'testpassword',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: new Date()
       };
 
       jest.spyOn(userRepository, 'getByEmail').mockImplementation(async () => {
@@ -29,12 +35,12 @@ describe('UserService', () => {
     });
 
     it('should create a new user', async () => {
-      const userDTO = {
+      const userDTO: UserPostRequestDTO = {
         email: 'test@example.com',
         password: 'testpassword'
       };
 
-      const userResponse = {
+      const userResponse: UserResponseDTO = {
         id: 1,
         email: userDTO.email
       };
@@ -49,7 +55,7 @@ describe('UserService', () => {
     });
 
     it('should throw UserAlreadyExistsException if the user already exists', async () => {
-      const userDTO = {
+      const userDTO: UserPostRequestDTO = {
         email: 'existing@example.com',
         password: 'testpassword'
       };
