@@ -1,7 +1,9 @@
-import express from 'express';
+import 'reflect-metadata';
+
 import cors from 'cors';
-import swaggerUI from 'swagger-ui-express';
+import express from 'express';
 import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUI from 'swagger-ui-express';
 import { MysqlDataSource } from './config/database';
 import { swaggerConfig } from './config/swagger';
 import routes from './routes';

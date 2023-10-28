@@ -1,5 +1,5 @@
-import { EmailNotValidException, PasswordMismatchException, PasswordNotValidException } from '../../exception';
-import { UserRequestValidator } from '../../validation/UserRequestValidator';
+import { EmailNotValidException, PasswordMismatchException, PasswordNotValidException } from '../../src/exception';
+import { UserRequestValidator } from '../../src/validation/UserRequestValidator';
 
 describe('UserRequestValidator', () => {
   describe('validateUserEmail', () => {

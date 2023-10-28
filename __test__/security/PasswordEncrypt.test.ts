@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { PasswordEncrypt } from '../../security/PasswordEncrypt';
+import { PasswordEncrypt } from '../../src/security/PasswordEncrypt';
 
 describe('PasswordEncrypt', () => {
   beforeEach(() => {

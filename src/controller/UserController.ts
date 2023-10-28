@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
+import { Service as Controller } from 'typedi';
+import { UserPostRequestDTO } from '../dto/UserPostRequestDTO';
+import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { BusinessException, RequiredFieldException } from '../exception';
+import { IControllerResponse } from '../interface/IControllerResponse';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
-import { RequiredFieldException } from '../exception/RequiredFieldException';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { UserResponseDTO } from '../dto/UserResponseDTO';
-import { BusinessException } from '../exception/BusinessException';
-import { UserPostRequestDTO } from '../dto/UserPostRequestDTO';
 
+@Controller()
 export class UserController {
+  constructor(private readonly userService: UserService) {}
+
   /**
    * @swagger
    * /signup:
@@ -55,12 +58,10 @@ export class UserController {
    *                   success: false
    *                   message: PasswordMismatchException. The provided password does not match the confirmation password.
    */
-  static async signup(req: Request, res: Response): Promise<void> {
-    const result: IControllerResponse<UserResponseDTO> = {} as IControllerResponse<UserResponseDTO>;
-
+  public async signup(req: Request, res: Response): Promise<void> {
     try {
-      const userPostRequest: UserPostRequestDTO = req.body;
-      const confirmPassword = req.body.confirmPassword;
+      const { email, password, confirmPassword } = req.body;
+      const userPostRequest: UserPostRequestDTO = { email: email, password: password };
 
       if (!userPostRequest.email) throw new RequiredFieldException('email');
       if (!userPostRequest.password) throw new RequiredFieldException('password');
@@ -69,21 +70,15 @@ export class UserController {
       UserRequestValidator.validateUserEmail(userPostRequest.email);
       UserRequestValidator.validateUserPassword(userPostRequest.password, confirmPassword);
 
-      const userResponse: UserResponseDTO = await UserService.createUser(userPostRequest);
-      result.success = true;
-      result.message = 'User created successfully';
-      result.data = userResponse;
+      const userResponse: UserResponseDTO = await this.userService.createUser(userPostRequest);
+      const result: IControllerResponse<UserResponseDTO> = { success: true, message: 'User created successfully', data: userResponse };
 
       res.status(201).json(result);
     } catch (error) {
-      result.success = false;
-      result.message = `${error.name}: ${error.message}`;
+      const result: IControllerResponse<UserResponseDTO> = { success: false, message: `${error.name}. ${error.message}` };
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
-      if (error instanceof BusinessException) {
-        res.status(error.status).json(result);
-      } else {
-        res.status(500).json(result);
-      }
+      res.status(statusCode).json(result);
     }
   }
 }

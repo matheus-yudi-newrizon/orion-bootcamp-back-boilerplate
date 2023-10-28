@@ -1,6 +1,10 @@
-import { UserAlreadyExistsException } from '../../exception/UserAlreadyExistsException';
-import { UserRepository } from '../../repository/UserRepository';
-import { UserService } from '../../service/UserService';
+import { Container } from 'typedi';
+import { UserAlreadyExistsException } from '../../src/exception';
+import { UserRepository } from '../../src/repository/UserRepository';
+import { UserService } from '../../src/service/UserService';
+
+const userService = Container.get(UserService);
+const userRepository = Container.get(UserRepository);
 
 describe('UserService', () => {
   describe('createUser', () => {
@@ -13,13 +17,13 @@ describe('UserService', () => {
         password: 'testpassword'
       };
 
-      jest.spyOn(UserRepository, 'getByEmail').mockImplementation(async () => {
+      jest.spyOn(userRepository, 'getByEmail').mockImplementation(async () => {
         return user;
       });
-      jest.spyOn(UserRepository, 'create').mockImplementation(() => {
+      jest.spyOn(userRepository, 'create').mockImplementation(() => {
         return user;
       });
-      jest.spyOn(UserRepository, 'save').mockImplementation(async () => {
+      jest.spyOn(userRepository, 'save').mockImplementation(async () => {
         return user;
       });
     });
@@ -35,11 +39,11 @@ describe('UserService', () => {
         email: userDTO.email
       };
 
-      jest.spyOn(UserRepository, 'getByEmail').mockImplementation(async () => {
+      jest.spyOn(userRepository, 'getByEmail').mockImplementation(async () => {
         return null;
       });
 
-      const result = await UserService.createUser(userDTO);
+      const result = await userService.createUser(userDTO);
 
       expect(result).toEqual(userResponse);
     });
@@ -50,7 +54,7 @@ describe('UserService', () => {
         password: 'testpassword'
       };
 
-      await expect(UserService.createUser(userDTO)).rejects.toThrow(UserAlreadyExistsException);
+      await expect(userService.createUser(userDTO)).rejects.toThrow(UserAlreadyExistsException);
     });
   });
 });
