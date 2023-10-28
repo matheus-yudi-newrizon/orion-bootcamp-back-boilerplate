@@ -26,7 +26,7 @@ export class UserRequestValidator {
    * @throws {PasswordMismatchException} - Throws an error if password and confirmPassword do not match.
    */
   public static validateUserPassword(password: string, confirmPassword: string): void {
-    const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$/;
+    const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]).{8,}$/;
 
     if (!passwordPattern.test(password)) {
       throw new PasswordNotValidException();
