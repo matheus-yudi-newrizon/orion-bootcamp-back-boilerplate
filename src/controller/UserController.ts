@@ -48,6 +48,8 @@ export class UserController {
    *               properties:
    *                 success:
    *                   type: boolean
+   *                 message:
+   *                   type: string
    *                 data:
    *                   type: object
    *                   properties:
@@ -57,6 +59,7 @@ export class UserController {
    *                       type: string
    *               example:
    *                 success: true
+   *                 message: 'User created successfully'
    *                 data:
    *                   id: 1
    *                   email: orion.bootcamp@email.com
