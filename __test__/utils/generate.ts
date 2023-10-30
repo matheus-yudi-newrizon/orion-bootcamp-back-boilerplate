@@ -1,6 +1,6 @@
-import { UserPostRequestDTO } from '../../src/dto/UserPostRequestDTO';
 import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
 import { User } from '../../src/entity/User';
+import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 
 /**
  * Generates a mock of user input.
@@ -20,10 +20,10 @@ export const userInput = () => {
 /**
  * Generates a mock of user post request.
  *
- * @returns A UserPostRequestDTO with the mocked data.
+ * @returns A IUserPostRequest with the mocked data.
  */
 export const userPostRequest = () => {
-  const userPostRequest: UserPostRequestDTO = {
+  const userPostRequest: IUserPostRequest = {
     email: 'orion@email.com',
     password: '12345678aA!'
   };

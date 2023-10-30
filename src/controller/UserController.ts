@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { Service as Controller } from 'typedi';
-import { UserPostRequestDTO } from '../dto/UserPostRequestDTO';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
+import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
@@ -81,7 +81,7 @@ export class UserController {
   public async signup(req: Request, res: Response): Promise<void> {
     try {
       const { email, password, confirmPassword } = req.body;
-      const userPostRequest: UserPostRequestDTO = { email: email, password: password };
+      const userPostRequest: IUserPostRequest = { email: email, password: password };
 
       if (!userPostRequest.email) throw new RequiredFieldException('email');
       if (!userPostRequest.password) throw new RequiredFieldException('password');
