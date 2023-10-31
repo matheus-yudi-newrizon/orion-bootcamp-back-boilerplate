@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { InvalidJwtTokenException } from '../exception/InvalidJwtTokenException';
 
 export class JwtService {
-  private static readonly secretKey = 'secretKey';
+  private static readonly secretKey = process.env.JWT_SECRET_KEY;
 
   /**
    * Generates a JWT token with the provided data.
@@ -25,11 +26,11 @@ export class JwtService {
    * @param token - JWT token to be verified.
    * @returns Decoded data from the token or null if the token is invalid.
    */
-  public static verifyToken(token: string): UserResponseDTO | null {
+  public static verifyToken(token: string): UserResponseDTO {
     try {
       return jwt.verify(token, this.secretKey);
     } catch (error) {
-      throw new Error(); // criar exception personalizada para esse erro
+      throw new InvalidJwtTokenException();
     }
   }
 }
