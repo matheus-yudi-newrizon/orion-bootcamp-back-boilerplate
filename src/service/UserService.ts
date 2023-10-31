@@ -1,9 +1,12 @@
 import { Service } from 'typedi';
+import { LoginResponseDTO } from '../dto/LoginResponseDTO';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { User } from '../entity/User';
 import { UserAlreadyExistsException } from '../exception';
+import { AuthenticationFailedException } from '../exception/AuthenticationFailedException';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserRepository } from '../repository/UserRepository';
+import { JwtService } from '../security/JwtService';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
 
 @Service()
@@ -30,5 +33,31 @@ export class UserService {
     await this.userRepository.save(user);
 
     return new UserResponseDTO(user);
+  }
+
+  /**
+   * Performs user login using the provided user data.
+   *
+   * @param userDTO - The user data including email and password.
+   * @param rememberMe - A flag indicating whether the session should be remembered.
+   *
+   * @returns A promise that resolves with the login response, including an authentication token.
+   * @throws {AuthenticationFailedException} if the email or password is incorrect.
+   */
+  public async login(userDTO: IUserPostRequest, rememberMe: boolean): Promise<LoginResponseDTO> {
+    const user: User = await this.userRepository.getByEmail(userDTO.email);
+    if (!user) {
+      throw new AuthenticationFailedException();
+    }
+
+    const validPassword = await PasswordEncrypt.compare(userDTO.password, user.password);
+    if (!validPassword) {
+      throw new AuthenticationFailedException();
+    }
+
+    const expiresIn = rememberMe ? undefined : '5h';
+    const token = JwtService.generateToken({ id: user.id, email: user.email }, expiresIn);
+
+    return new LoginResponseDTO(user, token);
   }
 }
