@@ -141,7 +141,7 @@ export class UserController {
 
       UserRequestValidator.validateUserEmail(email);
 
-      // TODO: userService.forgotPassword()
+      // TODO: https://trello.com/c/F75LgiZP/427-criar-m%C3%A9todo-de-solicita%C3%A7%C3%A3o-de-recupera%C3%A7%C3%A3o-de-senha-na-userservice
       const result: IControllerResponse<void> = { success: true, message: 'The recovery email has been sent.' };
 
       res.status(200).json(result);
