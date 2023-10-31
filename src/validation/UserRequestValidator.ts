@@ -11,7 +11,9 @@ export class UserRequestValidator {
    * @throws {EmailNotValidException} - Throws an exception if the email is not in the correct pattern.
    */
   public static validateUserEmail(email: string): void {
-    const emailPattern = /^[A-Za-z0-9.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    const emailPattern =
+      /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+
     if (!emailPattern.test(email)) {
       throw new EmailNotValidException();
     }
@@ -26,7 +28,7 @@ export class UserRequestValidator {
    * @throws {PasswordMismatchException} - Throws an error if password and confirmPassword do not match.
    */
   public static validateUserPassword(password: string, confirmPassword: string): void {
-    const passwordPattern = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[#?!@$%^&*-]).{8,}$/;
+    const passwordPattern = /^(?=.*[A-Z])(?=.*[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~])(?!.* ).{8,}$/;
 
     if (!passwordPattern.test(password)) {
       throw new PasswordNotValidException();

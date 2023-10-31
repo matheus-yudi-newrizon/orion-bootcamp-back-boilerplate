@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { Service as Controller } from 'typedi';
-import { UserPostRequestDTO } from '../dto/UserPostRequestDTO';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
+import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
@@ -15,53 +15,73 @@ export class UserController {
    * @swagger
    * /signup:
    *   post:
-   *     summary: Register user data.
+   *     summary: Register a new user.
    *     tags: [Sign up]
    *     consumes:
    *       - application/json
    *     produces:
    *       - application/json
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *             example:
+   *               email: orion.bootcamp@email.com
+   *               password: 12345678aA!
+   *               confirmPassword: 12345678aA!
    *     responses:
    *       '201':
-   *           description: Returns the user created in the database.
-   *           content:
-   *             application/json:
-   *               schema:
-   *                 type: object
-   *                 properties:
-   *                   success:
-   *                     type: boolean
-   *                   data:
-   *                     type: object
-   *                     properties:
-   *                       id:
-   *                         type: integer
-   *                       email:
-   *                         type: string
-   *                 example:
-   *                   success: true
-   *                   data:
-   *                     id: 1
-   *                     email: orion.bootcamp@email.com
+   *         description: Returns the user created in the database.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: integer
+   *                     email:
+   *                       type: string
+   *               example:
+   *                 success: true
+   *                 message: 'User created successfully'
+   *                 data:
+   *                   id: 1
+   *                   email: orion.bootcamp@email.com
    *       '400':
-   *           description: Returns error (Password mismatch).
-   *           content:
-   *             application/json:
-   *               schema:
-   *                 type: object
-   *                 properties:
-   *                   success:
-   *                     type: boolean
-   *                   message:
-   *                     type: string
-   *                 example:
-   *                   success: false
-   *                   message: PasswordMismatchException. The provided password does not match the confirmation password.
+   *         description: Returns PasswordMismatchException.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: PasswordMismatchException. The provided password does not match the confirmation password.
    */
   public async signup(req: Request, res: Response): Promise<void> {
     try {
       const { email, password, confirmPassword } = req.body;
-      const userPostRequest: UserPostRequestDTO = { email: email, password: password };
+      const userPostRequest: IUserPostRequest = { email: email, password: password };
 
       if (!userPostRequest.email) throw new RequiredFieldException('email');
       if (!userPostRequest.password) throw new RequiredFieldException('password');
