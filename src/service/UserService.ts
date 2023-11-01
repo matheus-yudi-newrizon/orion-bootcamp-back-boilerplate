@@ -1,7 +1,7 @@
 import { Service } from 'typedi';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { User } from '../entity/User';
-import { UserAlreadyExistsException } from '../exception';
+import { UserAlreadyExistsException, UserNotFoundException } from '../exception';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserRepository } from '../repository/UserRepository';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
@@ -27,6 +27,33 @@ export class UserService {
     userPostRequest.password = passwordEncrypted;
 
     const user: User = this.userRepository.create(userPostRequest);
+    await this.userRepository.save(user);
+
+    return new UserResponseDTO(user);
+  }
+
+  /**
+   * Resets the password for a user with the provided email.
+   *
+   * @param email - The email of the user whose password needs to be reset.
+   * @param newPassword - The new password for the user.
+   * @param token - The token received from the email link.
+   *
+   * @returns A promise that resolves with the updated user.
+   * @throws {UserNotFoundException} if the user with the provided email is not found.
+   * @throws {InvalidJwtTokenException} if the token is invalid or expired.
+   */
+  public async resetPassword(email: string, newPassword: string, token: string): Promise<UserResponseDTO> {
+    const user: User = await this.userRepository.getByEmail(email);
+
+    if (!user) {
+      throw new UserNotFoundException(email);
+    }
+    if (!verifyToken(token)) {
+      throw new InvalidJwtTokenException();
+    }
+    const newPasswordEncrypted: string = await PasswordEncrypt.encrypt(newPassword);
+    user.password = newPasswordEncrypted;
     await this.userRepository.save(user);
 
     return new UserResponseDTO(user);
