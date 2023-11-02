@@ -6,7 +6,7 @@ import { IControllerResponse } from '../interface/IControllerResponse';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
-
+import { LoginResponseDTO } from 'dto/LoginResponseDTO';
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -101,4 +101,38 @@ export class UserController {
       res.status(statusCode).json(result);
     }
   }
+
+  public async login(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password, rememberMe } = req.body;
+      const userCredentials: IUserPostRequest = { email, password };
+      
+      if (!userCredentials.email) {
+        throw new RequiredFieldException('email');
+      }
+  
+      if (!userCredentials.password) {
+        throw new RequiredFieldException('password');
+      }
+  
+      const loginResult: LoginResponseDTO = await this.userService.login(userCredentials, rememberMe);
+      const response: IControllerResponse<LoginResponseDTO> = {
+        success: true,
+        message: 'Successful login',
+        data: loginResult,
+      };
+  
+      res.status(200).json(response);
+    } catch (error) {
+      const errorResponse: IControllerResponse<LoginResponseDTO> = {
+        success: false,
+        message: `${error.name}, ${error.message}`,
+      };
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
+  
+      res.status(statusCode).json(errorResponse);
+    }
+  }  
 }
+    
+
