@@ -4,7 +4,7 @@ import { User } from './User';
 @Entity()
 export class Token {
   @PrimaryColumn()
-  id?: number;
+  id: number;
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'id' })
@@ -14,5 +14,5 @@ export class Token {
   token: string;
 
   @CreateDateColumn()
-  createdAt?: Date;
+  createdAt: Date;
 }
