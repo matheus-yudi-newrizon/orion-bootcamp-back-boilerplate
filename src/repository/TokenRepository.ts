@@ -1,5 +1,5 @@
 import { Service as Repository } from 'typedi';
-import { Repository as TypeOrmRepository } from 'typeorm';
+import { DeepPartial, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Token } from '../entity/Token';
 import { DatabaseOperationFailException } from '../exception';
@@ -18,6 +18,22 @@ export class TokenRepository {
   public async save(token: Token): Promise<Token> {
     try {
       return await this.ormRepository.save(token);
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Creates a new token instance and copies all token properties from this object into a new token.
+   * Note that it copies only properties that are present in token schema.
+   *
+   * @param entityLike - An object containing properties to be copied into a new token instance.
+   * @returns A new token instance with copied properties.
+   * @throws {DatabaseOperationFailException} If the operation fails.
+   */
+  public create(entityLike: DeepPartial<Token>): Token {
+    try {
+      return this.ormRepository.create(entityLike);
     } catch (error) {
       throw new DatabaseOperationFailException();
     }
