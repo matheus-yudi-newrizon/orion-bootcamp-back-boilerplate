@@ -66,10 +66,11 @@ export class UserService {
       const resetToken: string = crypto.randomBytes(32).toString('hex');
       const hash: string = await PasswordEncrypt.encrypt(resetToken);
 
-      await this.tokenRepository.save({ user: user, token: hash });
+      const token: Token = this.tokenRepository.create({ user: user, token: hash });
+      await this.tokenRepository.save(token);
 
       const username: string = user.email.slice(0, user.email.indexOf('@'));
-      const link: string = `http://localhost:4200/reset-password?token=${resetToken}&id=${user.id}`;
+      const link: string = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}&id=${user.id}`;
 
       EmailService.sendEmail(
         user.email,
