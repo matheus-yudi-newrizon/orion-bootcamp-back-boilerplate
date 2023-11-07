@@ -101,4 +101,95 @@ export class UserController {
       res.status(statusCode).json(result);
     }
   }
+
+  /**
+   * @swagger
+   * /signup:
+   *   patch:
+   *     summary: Reset user password.
+   *     tags: [Reset password]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *               token:
+   *                 type: string
+   *             example:
+   *               email: orion.bootcamp@email.com
+   *               password: 12345678aA!
+   *               confirmPassword: 12345678aA!
+   *               token: fjasdJDASAG43871233csafje
+   *     responses:
+   *       '200':
+   *         description: Returns the user created in the database.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: integer
+   *                     email:
+   *                       type: string
+   *               example:
+   *                 success: true
+   *                 message: 'User created successfully'
+   *                 data:
+   *                   id: 1
+   *                   email: orion.bootcamp@email.com
+   *       '400':
+   *         description: Returns BusinessException.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   */
+  public async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, token, password, confirmPassword } = req.body;
+
+      if (!email) throw new RequiredFieldException('id');
+      if (!token) throw new RequiredFieldException('token');
+      if (!password) throw new RequiredFieldException('password');
+      if (!confirmPassword) throw new RequiredFieldException('confirmPassword');
+
+      UserRequestValidator.validateUserEmail(email);
+      UserRequestValidator.validateUserPassword(password, confirmPassword);
+
+      const userResponse: UserResponseDTO = await this.userService.resetPassword(email, password, token);
+      const result: IControllerResponse<UserResponseDTO> = { success: true, message: 'Password change successfully', data: userResponse };
+
+      res.status(200).json(result);
+    } catch (error) {
+      const result: IControllerResponse<UserResponseDTO> = { success: false, message: `${error.name}. ${error.message}` };
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
+
+      res.status(statusCode).json(result);
+    }
+  }
 }

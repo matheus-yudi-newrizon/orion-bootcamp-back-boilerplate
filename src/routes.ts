@@ -10,4 +10,6 @@ router.get('/ping', (_req, res) => res.send('pong'));
 
 router.post('/signup', (req, res) => userController.signup(req, res));
 
+router.post('/reset-password', (req, res) => userController.resetPassword(req, res));
+
 export default router;
