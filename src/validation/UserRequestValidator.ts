@@ -11,8 +11,7 @@ export class UserRequestValidator {
    * @throws {EmailNotValidException} - Throws an exception if the email is not in the correct pattern.
    */
   public static validateUserEmail(email: string): void {
-    const emailPattern =
-      /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
+    const emailPattern = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/;
 
     if (!emailPattern.test(email)) {
       throw new EmailNotValidException();
