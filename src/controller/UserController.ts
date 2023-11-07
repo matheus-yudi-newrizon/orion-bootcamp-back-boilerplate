@@ -102,37 +102,74 @@ export class UserController {
     }
   }
 
+  /**
+   * @swagger
+   * /login:
+   *   post:
+   *     summary: Authenticate and log in a user.
+   *     tags: [Authentication]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               rememberMe:
+   *                 type: boolean
+   *             example:
+   *               email: user@example.com
+   *               password: userpassword
+   *               rememberMe: true
+   *     responses:
+   *       '200':
+   *         description: Returns a token for successful login.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 token:
+   *                   type: string
+   *               example:
+   *                 token: your-jwt-token
+   *       '400':
+   *         description: Bad Request. Invalid credentials or missing fields.
+   *       '401':
+   *         description: Unauthorized. Authentication failed.
+   */
   public async login(req: Request, res: Response): Promise<void> {
     try {
       const { email, password, rememberMe } = req.body;
       const userCredentials: IUserPostRequest = { email, password };
-      
       if (!userCredentials.email) {
         throw new RequiredFieldException('email');
       }
-  
       if (!userCredentials.password) {
         throw new RequiredFieldException('password');
       }
-  
       const loginResult: LoginResponseDTO = await this.userService.login(userCredentials, rememberMe);
       const response: IControllerResponse<LoginResponseDTO> = {
         success: true,
         message: 'Successful login',
-        data: loginResult,
+        data: loginResult
       };
-  
       res.status(200).json(response);
     } catch (error) {
       const errorResponse: IControllerResponse<LoginResponseDTO> = {
         success: false,
-        message: `${error.name}, ${error.message}`,
+        message: `${error.name}, ${error.message}`
       };
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
-  
       res.status(statusCode).json(errorResponse);
     }
-  }  
+  }
 }
-    
-
