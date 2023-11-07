@@ -1,5 +1,5 @@
 import { Service as Repository } from 'typedi';
-import { DeepPartial, Repository as TypeOrmRepository } from 'typeorm';
+import { DeepPartial, Repository as TypeOrmRepository, UpdateResult } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { User } from '../entity/User';
 import { DatabaseOperationFailException } from '../exception';
@@ -51,6 +51,22 @@ export class UserRepository {
   public create(entityLike: DeepPartial<User>): User {
     try {
       return this.ormRepository.create(entityLike);
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Updates a user by ID with the given data.
+   *
+   * @param id - The ID of the user to update.
+   * @param userData - The data to update.
+   * @returns A promise that resolves with the update result.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
+  public async updateUser(id: number, userData: DeepPartial<User>): Promise<UpdateResult> {
+    try {
+      return await this.ormRepository.update(id, userData);
     } catch (error) {
       throw new DatabaseOperationFailException();
     }
