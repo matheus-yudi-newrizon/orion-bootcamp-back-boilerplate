@@ -1,14 +1,21 @@
+import * as crypto from 'crypto';
 import { Service } from 'typedi';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { Token } from '../entity/Token';
 import { User } from '../entity/User';
 import { UserAlreadyExistsException } from '../exception';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
+import { TokenRepository } from '../repository/TokenRepository';
 import { UserRepository } from '../repository/UserRepository';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
+import { EmailService } from '../utils/EmailService';
 
 @Service()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly tokenRepository: TokenRepository
+  ) {}
 
   /**
    * Creates a new user with the provided userPostRequest.
@@ -30,5 +37,47 @@ export class UserService {
     await this.userRepository.save(user);
 
     return new UserResponseDTO(user);
+  }
+
+  /**
+   * Initiates a reset password flow. Finds user by email, generates a token and sends the recovery email.
+   *
+   * @param email - The user email.
+   *
+   * @returns A promise that resolves with void.
+   * @throws {DatabaseOperationFailException} if there is a database operation failure.
+   * @throws {SendEmailFailException} if there is a failure sending email.
+   */
+  public async forgotPassword(email: string): Promise<void> {
+    const user: User = await this.userRepository.getByEmail(email);
+
+    if (user) {
+      const oldToken: Token = await this.tokenRepository.findById(user.id);
+
+      if (oldToken) {
+        const expiresIn: number = oldToken.createdAt.getTime() + 1800000;
+        const currentTime: number = new Date().getTime();
+
+        if (expiresIn > currentTime) return;
+
+        await this.tokenRepository.deleteById(user.id);
+      }
+
+      const resetToken: string = crypto.randomBytes(32).toString('hex');
+      const hash: string = await PasswordEncrypt.encrypt(resetToken);
+
+      const token: Token = this.tokenRepository.create({ user: user, token: hash });
+      await this.tokenRepository.save(token);
+
+      const username: string = user.email.slice(0, user.email.indexOf('@'));
+      const link: string = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}&id=${user.id}`;
+
+      EmailService.sendEmail(
+        user.email,
+        'Orion Bootcamp | Password Reset Request',
+        { username: username, link: link },
+        './template/ForgotPassword.handlebars'
+      );
+    }
   }
 }
