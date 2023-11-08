@@ -6,7 +6,8 @@ import { IControllerResponse } from '../interface/IControllerResponse';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
-
+import { LoginResponseDTO } from 'dto/LoginResponseDTO';
+import { ErrorTemplate } from 'exception/ErrorTemplate';
 @Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -81,11 +82,17 @@ export class UserController {
   public async signup(req: Request, res: Response): Promise<void> {
     try {
       const { email, password, confirmPassword } = req.body;
-      const userPostRequest: IUserPostRequest = { email: email, password: password };
+      const userPostRequest: IUserPostRequest = { email, password };
 
-      if (!userPostRequest.email) throw new RequiredFieldException('email');
-      if (!userPostRequest.password) throw new RequiredFieldException('password');
-      if (!confirmPassword) throw new RequiredFieldException('confirmPassword');
+      if (!userPostRequest.email) {
+        throw new RequiredFieldException('email');
+      }
+      if (!userPostRequest.password) {
+        throw new RequiredFieldException('password');
+      }
+      if (!confirmPassword) {
+        throw new RequiredFieldException('confirmPassword');
+      }
 
       UserRequestValidator.validateUserEmail(userPostRequest.email);
       UserRequestValidator.validateUserPassword(userPostRequest.password, confirmPassword);
@@ -95,10 +102,87 @@ export class UserController {
 
       res.status(201).json(result);
     } catch (error) {
-      const result: IControllerResponse<UserResponseDTO> = { success: false, message: `${error.name}. ${error.message}` };
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
       res.status(statusCode).json(result);
+    }
+  }
+
+  /**
+   * @swagger
+   * /login:
+   *   post:
+   *     summary: Authenticate and log in a user.
+   *     tags: [Authentication]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               rememberMe:
+   *                 type: boolean
+   *             example:
+   *               email: user@example.com
+   *               password: userpassword
+   *               rememberMe: true
+   *     responses:
+   *       '200':
+   *         description: Returns a token for successful login.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 token:
+   *                   type: string
+   *               example:
+   *                 token: your-jwt-token
+   *       '400':
+   *         description: Bad Request. Invalid credentials or missing fields.
+   *       '401':
+   *         description: Unauthorized. Authentication failed.
+   *       '500':
+   *         description: Internal Server Error. An internal error occurred.
+   */
+  public async login(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, password, rememberMe } = req.body;
+      const userCredentials: IUserPostRequest = { email, password };
+
+      if (!userCredentials.email) {
+        throw new RequiredFieldException('email');
+      }
+      if (!userCredentials.password) {
+        throw new RequiredFieldException('password');
+      }
+
+      const loginResult: LoginResponseDTO = await this.userService.login(userCredentials, rememberMe);
+      const response: IControllerResponse<LoginResponseDTO> = {
+        success: true,
+        message: 'Successful login',
+        data: loginResult
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      const errorResponse = ErrorTemplate.badRequest('Invalid credentials or missing fields');
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
+
+      res.status(statusCode).json(errorResponse);
     }
   }
 }
