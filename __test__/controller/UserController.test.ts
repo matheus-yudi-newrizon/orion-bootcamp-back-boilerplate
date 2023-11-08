@@ -12,7 +12,7 @@ import {
 import routes from '../../src/routes';
 import { UserService } from '../../src/service/UserService';
 import { UserRequestValidator } from '../../src/validation/UserRequestValidator';
-import { Generate } from '../utils/Generate';
+import { Generate } from '../mocks/Generate';
 
 const app = express();
 app.use(express.json());

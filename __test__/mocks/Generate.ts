@@ -1,4 +1,5 @@
 import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
+import { Token } from '../../src/entity/Token';
 import { User } from '../../src/entity/User';
 import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 
@@ -71,5 +72,36 @@ export class Generate {
     };
 
     return input;
+  }
+
+  /**
+   * Generates a mock of token data.
+   *
+   * @returns A Token with the mocked data.
+   */
+  public tokenData(): Token {
+    const user = this.userData();
+
+    const token: Token = {
+      id: 1,
+      user: user,
+      token: 'abcde12345GHIJK!@#$%',
+      createdAt: new Date()
+    };
+
+    return token;
+  }
+
+  /**
+   * Generates a mock of expired token data.
+   *
+   * @returns A Token with the mocked data.
+   */
+  public tokenDataExpired(): Token {
+    const token: Token = this.tokenData();
+    token.token = 'abcde12345';
+    token.createdAt = new Date('2023/10/07');
+
+    return token;
   }
 }
