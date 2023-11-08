@@ -86,11 +86,11 @@ describe('UserService', () => {
     it('should send an email if token is expired', async () => {
       const input = generate.forgotPasswordInput();
       const user: User = generate.userData();
-      const tokenExpired: Token = generate.tokenDataExpired();
+      const expiredToken: Token = generate.expiredTokenData();
       const token: Token = generate.tokenData();
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
-      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(tokenExpired);
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(expiredToken);
       const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockResolvedValue();
       const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(token.token);
       const spyCreate = jest.spyOn(tokenRepository, 'create').mockReturnValue(token);
@@ -101,7 +101,7 @@ describe('UserService', () => {
 
       expect(spyGetByEmail).toHaveBeenCalledWith(input.email);
       expect(spyFindById).toHaveBeenCalledWith(user.id);
-      expect(spyDeleteById).toHaveBeenCalledWith(tokenExpired.id);
+      expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
       expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);
@@ -160,10 +160,10 @@ describe('UserService', () => {
     it('should throw DatabaseOperationFailException if operation fails while deleting token by id', async () => {
       const input = generate.forgotPasswordInput();
       const user: User = generate.userData();
-      const tokenExpired: Token = generate.tokenDataExpired();
+      const expiredToken: Token = generate.expiredTokenData();
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
-      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(tokenExpired);
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(expiredToken);
       const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockImplementation(() => {
         throw new DatabaseOperationFailException();
       });
@@ -171,17 +171,17 @@ describe('UserService', () => {
       await expect(userService.forgotPassword(input.email)).rejects.toThrow(DatabaseOperationFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(input.email);
       expect(spyFindById).toHaveBeenCalledWith(user.id);
-      expect(spyDeleteById).toHaveBeenCalledWith(tokenExpired.id);
+      expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
     });
 
     it('should throw DatabaseOperationFailException if operation fails while creating token', async () => {
       const input = generate.forgotPasswordInput();
       const user: User = generate.userData();
-      const tokenExpired: Token = generate.tokenDataExpired();
+      const expiredToken: Token = generate.expiredTokenData();
       const token: Token = generate.tokenData();
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
-      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(tokenExpired);
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(expiredToken);
       const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockResolvedValue();
       const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(token.token);
       const spyCreate = jest.spyOn(tokenRepository, 'create').mockImplementation(() => {
@@ -191,7 +191,7 @@ describe('UserService', () => {
       await expect(userService.forgotPassword(input.email)).rejects.toThrow(DatabaseOperationFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(input.email);
       expect(spyFindById).toHaveBeenCalledWith(user.id);
-      expect(spyDeleteById).toHaveBeenCalledWith(tokenExpired.id);
+      expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
       expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
     });
@@ -199,11 +199,11 @@ describe('UserService', () => {
     it('should throw DatabaseOperationFailException if operation fails while saving token', async () => {
       const input = generate.forgotPasswordInput();
       const user: User = generate.userData();
-      const tokenExpired: Token = generate.tokenDataExpired();
+      const expiredToken: Token = generate.expiredTokenData();
       const token: Token = generate.tokenData();
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
-      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(tokenExpired);
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(expiredToken);
       const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockResolvedValue();
       const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(token.token);
       const spyCreate = jest.spyOn(tokenRepository, 'create').mockReturnValue(token);
@@ -214,7 +214,7 @@ describe('UserService', () => {
       await expect(userService.forgotPassword(input.email)).rejects.toThrow(DatabaseOperationFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(input.email);
       expect(spyFindById).toHaveBeenCalledWith(user.id);
-      expect(spyDeleteById).toHaveBeenCalledWith(tokenExpired.id);
+      expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
       expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);
@@ -223,11 +223,11 @@ describe('UserService', () => {
     it('should throw SendEmailFailException if there is a failure sending email', async () => {
       const input = generate.forgotPasswordInput();
       const user: User = generate.userData();
-      const tokenExpired: Token = generate.tokenDataExpired();
+      const expiredToken: Token = generate.expiredTokenData();
       const token: Token = generate.tokenData();
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
-      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(tokenExpired);
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(expiredToken);
       const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockResolvedValue();
       const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(token.token);
       const spyCreate = jest.spyOn(tokenRepository, 'create').mockReturnValue(token);
@@ -239,7 +239,7 @@ describe('UserService', () => {
       await expect(userService.forgotPassword(input.email)).rejects.toThrow(SendEmailFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(input.email);
       expect(spyFindById).toHaveBeenCalledWith(user.id);
-      expect(spyDeleteById).toHaveBeenCalledWith(tokenExpired.id);
+      expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
       expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);

@@ -3,6 +3,9 @@ import { Token } from '../../src/entity/Token';
 import { User } from '../../src/entity/User';
 import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 
+/**
+ * Class for generating mock data for tests.
+ */
 export class Generate {
   /**
    * Generates a mock of sign up input.
@@ -37,10 +40,12 @@ export class Generate {
    * @returns A User with the mocked data.
    */
   public userData(): User {
+    const userPostRequest: IUserPostRequest = this.userPostRequest();
+
     const user: User = {
       id: 1,
-      email: 'orion@email.com',
-      password: '12345678aA!',
+      email: userPostRequest.email,
+      password: userPostRequest.password,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: new Date()
@@ -66,12 +71,9 @@ export class Generate {
    * @returns An object with the mocked data.
    */
   public forgotPasswordInput() {
-    const user: User = this.userData();
-    const input = {
-      email: user.email
-    };
+    const input = this.signUpInput();
 
-    return input;
+    return { email: input.email };
   }
 
   /**
@@ -97,9 +99,9 @@ export class Generate {
    *
    * @returns A Token with the mocked data.
    */
-  public tokenDataExpired(): Token {
+  public expiredTokenData(): Token {
     const token: Token = this.tokenData();
-    token.token = 'abcde12345';
+    token.token = 'ABCDE!@#$%ghijkl12345';
     token.createdAt = new Date('2023/10/07');
 
     return token;
