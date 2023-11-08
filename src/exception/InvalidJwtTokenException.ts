@@ -7,9 +7,9 @@ export class InvalidJwtTokenException extends BusinessException {
   /**
    * Creates a new instance of InvalidJwtTokenException.
    */
-  constructor() {
-    super('Invalid JWT token');
+  constructor(name: string, message: string) {
+    super(message);
     this.status = 401;
-    this.name = 'InvalidJwtTokenException';
+    this.name = name;
   }
 }
