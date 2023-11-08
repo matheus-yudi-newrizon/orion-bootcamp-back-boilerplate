@@ -9,7 +9,6 @@ const userController: UserController = Container.get(UserController);
 router.get('/ping', (_req, res) => res.send('pong'));
 
 router.post('/signup', (req, res) => userController.signup(req, res));
-
 router.post('/login', (req, res) => userController.login(req, res));
 
 export default router;
