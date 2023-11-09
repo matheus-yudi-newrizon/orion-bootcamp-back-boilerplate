@@ -1,11 +1,10 @@
 import { Service } from 'typedi';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { User } from '../entity/User';
-import { UserAlreadyExistsException } from '../exception';
+import { InvalidJwtTokenException, UserAlreadyExistsException } from '../exception';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserRepository } from '../repository/UserRepository';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
-import { InvalidJwtTokenException } from '../exception';
 
 @Service()
 export class UserService {
