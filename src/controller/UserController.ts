@@ -105,7 +105,7 @@ export class UserController {
   /**
    * @swagger
    * /signup:
-   *   patch:
+   *   post:
    *     summary: Reset user password.
    *     tags: [Reset password]
    *     consumes:
@@ -168,20 +168,30 @@ export class UserController {
    *                   type: boolean
    *                 message:
    *                   type: string
+   *       '500':
+   *         description: Returns Error.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
    */
   public async resetPassword(req: Request, res: Response): Promise<void> {
     try {
-      const { email, token, password, confirmPassword } = req.body;
+      const { id, token, password, confirmPassword } = req.body;
 
-      if (!email) throw new RequiredFieldException('id');
+      if (!id) throw new RequiredFieldException('id');
       if (!token) throw new RequiredFieldException('token');
       if (!password) throw new RequiredFieldException('password');
       if (!confirmPassword) throw new RequiredFieldException('confirmPassword');
 
-      UserRequestValidator.validateUserEmail(email);
       UserRequestValidator.validateUserPassword(password, confirmPassword);
 
-      const userResponse: UserResponseDTO = await this.userService.resetPassword(email, password, token);
+      const userResponse: UserResponseDTO = await this.userService.resetPassword(id, password, token);
       const result: IControllerResponse<UserResponseDTO> = { success: true, message: 'Password change successfully', data: userResponse };
 
       res.status(200).json(result);
