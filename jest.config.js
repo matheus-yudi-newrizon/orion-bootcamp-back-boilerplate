@@ -6,5 +6,9 @@ module.exports = {
   forceExit: true,
   clearMocks: true,
   resetMocks: true,
-  restoreMocks: true
+  restoreMocks: true,
+  fakeTimers: {
+    enableGlobally: true,
+    now: new Date('2023-11-08T12:00:00').getTime()
+  }
 };

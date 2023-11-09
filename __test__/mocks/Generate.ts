@@ -102,7 +102,7 @@ export class Generate {
   public expiredTokenData(): Token {
     const token: Token = this.tokenData();
     token.token = 'ABCDE!@#$%ghijkl12345';
-    token.createdAt = new Date('2023/10/07');
+    token.createdAt.setMinutes(token.createdAt.getMinutes() - 30);
 
     return token;
   }
