@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryColumn, Unique } from 'typeorm';
 import { User } from './User';
 
 @Entity()
+@Unique(['token'])
 export class Token {
   @PrimaryColumn()
   id: number;

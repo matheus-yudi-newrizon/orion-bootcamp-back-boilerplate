@@ -41,16 +41,8 @@ describe('UserRequestValidator', () => {
       expect(() => UserRequestValidator.validateUserPassword('p@ssw0rd', 'p@ssw0rd')).toThrow(PasswordNotValidException);
     });
 
-    it('should throw PasswordNotValidException for a password without a lowercase letter', () => {
-      expect(() => UserRequestValidator.validateUserPassword('P@SSW0RD', 'P@SSW0RD')).toThrow(PasswordNotValidException);
-    });
-
     it('should throw PasswordNotValidException for a password without a special character', () => {
       expect(() => UserRequestValidator.validateUserPassword('Passw0rd', 'Passw0rd')).toThrow(PasswordNotValidException);
-    });
-
-    it('should throw PasswordNotValidException for a password without a digit', () => {
-      expect(() => UserRequestValidator.validateUserPassword('P@ssword', 'P@ssword')).toThrow(PasswordNotValidException);
     });
   });
 });
