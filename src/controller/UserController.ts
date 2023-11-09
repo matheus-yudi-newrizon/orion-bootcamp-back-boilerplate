@@ -191,8 +191,8 @@ export class UserController {
 
       UserRequestValidator.validateUserPassword(password, confirmPassword);
 
-      const userResponse: UserResponseDTO = await this.userService.resetPassword(id, password, token);
-      const result: IControllerResponse<UserResponseDTO> = { success: true, message: 'Password change successfully', data: userResponse };
+      await this.userService.resetPassword(id, password, token);
+      const result: IControllerResponse<UserResponseDTO> = { success: true, message: 'Password change successfully' };
 
       res.status(200).json(result);
     } catch (error) {
