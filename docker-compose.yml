@@ -14,10 +14,12 @@ services:
       - 4444:4444
     command: npm run start:dev
     environment:
+      JWT_SECRET_KEY: a&$L9%KJn7r#5D@wZp^q1Pt!2GyUvSbX
       NODE_ENV: development
       SERVER_PORT: 4444
       DB_DATABASE: orion
       DB_CONNECTION_STRING: mysql://orion_root:j5m966qp7jiypfda@orion-mysql:3306
+      CLIENT_URL: http://localhost:4200
     networks:
       - orion-connect
 

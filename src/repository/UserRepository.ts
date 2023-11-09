@@ -41,6 +41,22 @@ export class UserRepository {
   }
 
   /**
+   * Finds first user by a given id.
+   * If user was not found in the database - returns null.
+   *
+   * @param id - The id of the user to retrieve.
+   * @returns A promise that resolves with the user if found; otherwise, null.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
+  public async getById(id: number): Promise<User | null> {
+    try {
+      return await this.ormRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
    * Creates a new user instance and copies all user properties from this object into a new user.
    * Note that it copies only properties that are present in user schema.
    *
