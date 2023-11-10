@@ -318,7 +318,7 @@ export class UserController {
    *               token:
    *                 type: string
    *             example:
-   *               email: orion.bootcamp@email.com
+   *               id: 10
    *               password: 12345678aA!
    *               confirmPassword: 12345678aA!
    *               token: fjasdJDASAG43871233csafje
