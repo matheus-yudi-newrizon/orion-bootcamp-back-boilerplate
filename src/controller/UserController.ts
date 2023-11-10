@@ -252,7 +252,7 @@ export class UserController {
    *                 success: true
    *                 message: The recovery email has been sent.
    *       '400':
-   *         description: Returns error (RequiredFieldException).
+   *         description: Returns RequiredFieldException.
    *         content:
    *           application/json:
    *             schema:
@@ -275,11 +275,17 @@ export class UserController {
       UserRequestValidator.validateUserEmail(email);
 
       await this.userService.forgotPassword(email);
-      const result: IControllerResponse<void> = { success: true, message: 'The recovery email has been sent.' };
+      const result: IControllerResponse<void> = {
+        success: true,
+        message: 'The recovery email has been sent.'
+      };
 
       res.status(200).json(result);
     } catch (error) {
-      const result: IControllerResponse<void> = { success: false, message: `${error.name}. ${error.message}` };
+      const result: IControllerResponse<void> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
       res.status(statusCode).json(result);
@@ -288,7 +294,7 @@ export class UserController {
 
   /**
    * @swagger
-   * /signup:
+   * /reset-password:
    *   post:
    *     summary: Reset user password.
    *     tags: [Reset password]
@@ -318,7 +324,7 @@ export class UserController {
    *               token: fjasdJDASAG43871233csafje
    *     responses:
    *       '200':
-   *         description: Returns the user created in the database.
+   *         description: Returns that the password was changed successfully.
    *         content:
    *           application/json:
    *             schema:
@@ -328,21 +334,11 @@ export class UserController {
    *                   type: boolean
    *                 message:
    *                   type: string
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     id:
-   *                       type: integer
-   *                     email:
-   *                       type: string
    *               example:
    *                 success: true
-   *                 message: 'User created successfully'
-   *                 data:
-   *                   id: 1
-   *                   email: orion.bootcamp@email.com
+   *                 message: 'Password change successfully.'
    *       '400':
-   *         description: Returns BusinessException.
+   *         description: Returns PasswordChangeFailedException.
    *         content:
    *           application/json:
    *             schema:
@@ -352,6 +348,9 @@ export class UserController {
    *                   type: boolean
    *                 message:
    *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'PasswordChangeFailedException: Password change failed.'
    *       '500':
    *         description: Returns Error.
    *         content:
@@ -363,6 +362,9 @@ export class UserController {
    *                   type: boolean
    *                 message:
    *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'Type error: property was undefined'
    */
   public async resetPassword(req: Request, res: Response): Promise<void> {
     try {
@@ -376,11 +378,17 @@ export class UserController {
       UserRequestValidator.validateUserPassword(password, confirmPassword);
 
       await this.userService.resetPassword(id, password, token);
-      const result: IControllerResponse<UserResponseDTO> = { success: true, message: 'Password change successfully' };
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: true,
+        message: 'Password change successfully.'
+      };
 
       res.status(200).json(result);
     } catch (error) {
-      const result: IControllerResponse<UserResponseDTO> = { success: false, message: `${error.name}. ${error.message}` };
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
       res.status(statusCode).json(result);
