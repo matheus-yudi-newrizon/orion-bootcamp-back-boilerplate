@@ -309,8 +309,8 @@ export class UserController {
    *           schema:
    *             type: object
    *             properties:
-   *               email:
-   *                 type: string
+   *               id:
+   *                 type: number
    *               password:
    *                 type: string
    *               confirmPassword:
