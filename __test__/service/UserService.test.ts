@@ -1,11 +1,14 @@
 import { Container } from 'typedi';
+import { LoginResponseDTO } from '../../src/dto/LoginResponseDTO';
 import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
 import { Token } from '../../src/entity/Token';
 import { User } from '../../src/entity/User';
 import { DatabaseOperationFailException, SendEmailFailException, UserAlreadyExistsException } from '../../src/exception';
+import { AuthenticationFailedException } from '../../src/exception/AuthenticationFailedException';
 import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 import { TokenRepository } from '../../src/repository/TokenRepository';
 import { UserRepository } from '../../src/repository/UserRepository';
+import { JwtService } from '../../src/security/JwtService';
 import { PasswordEncrypt } from '../../src/security/PasswordEncrypt';
 import { UserService } from '../../src/service/UserService';
 import { EmailService } from '../../src/utils/EmailService';
@@ -79,6 +82,62 @@ describe('UserService', () => {
       expect(spyEncrypt).toHaveBeenCalledWith(userPostRequest.password);
       expect(spyCreate).toHaveBeenCalledWith(userPostRequest);
       expect(spySave).toHaveBeenCalledWith(user);
+    });
+  });
+
+  describe('login', () => {
+    it('should return the login response', async () => {
+      const user: User = generate.userData();
+      const loginInput = generate.loginInput();
+      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+      const jwt = generate.encodedJwt();
+      const loginResponse: LoginResponseDTO = generate.loginResponse();
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyGenerateToken = jest.spyOn(JwtService, 'generateToken').mockReturnValue(jwt);
+
+      const result: UserResponseDTO = await userService.login(userDTO, loginInput.rememberMe);
+
+      expect(result).toEqual(loginResponse);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+      expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
+      expect(spyGenerateToken).toHaveBeenCalledWith({ id: user.id, email: user.email }, loginInput.rememberMe ? undefined : '5h');
+    });
+
+    it('should throw AuthenticationFailedException if the email is incorrect', async () => {
+      const loginInput = generate.loginInput();
+      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(null);
+
+      await expect(userService.login(userDTO, loginInput.rememberMe)).rejects.toThrow(AuthenticationFailedException);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+    });
+
+    it('should throw AuthenticationFailedException if the password is incorrect', async () => {
+      const loginInput = generate.loginInput();
+      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+      const user: User = generate.userData();
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(false);
+
+      await expect(userService.login(userDTO, loginInput.rememberMe)).rejects.toThrow(AuthenticationFailedException);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+      expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
+    });
+
+    it('should throw DatabaseOperationFailException if the database operation fails', async () => {
+      const loginInput = generate.loginInput();
+      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(userService.login(userDTO, loginInput.rememberMe)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
     });
   });
 
