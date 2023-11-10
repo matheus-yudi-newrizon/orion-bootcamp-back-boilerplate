@@ -1,5 +1,5 @@
 import { Service as Repository } from 'typedi';
-import { DeepPartial, Repository as TypeOrmRepository } from 'typeorm';
+import { DeepPartial, Repository as TypeOrmRepository, UpdateResult } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { User } from '../entity/User';
 import { DatabaseOperationFailException } from '../exception';
@@ -41,6 +41,22 @@ export class UserRepository {
   }
 
   /**
+   * Finds first user by a given id.
+   * If user was not found in the database - returns null.
+   *
+   * @param id - The id of the user to retrieve.
+   * @returns A promise that resolves with the user if found; otherwise, null.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
+  public async getById(id: number): Promise<User | null> {
+    try {
+      return await this.ormRepository.findOne({ where: { id } });
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
    * Creates a new user instance and copies all user properties from this object into a new user.
    * Note that it copies only properties that are present in user schema.
    *
@@ -51,6 +67,22 @@ export class UserRepository {
   public create(entityLike: DeepPartial<User>): User {
     try {
       return this.ormRepository.create(entityLike);
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Updates a user by ID with the given data.
+   *
+   * @param id - The ID of the user to update.
+   * @param userData - The data to update.
+   * @returns A promise that resolves with the update result.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
+  public async updateUser(id: number, userData: DeepPartial<User>): Promise<UpdateResult> {
+    try {
+      return await this.ormRepository.update(id, userData);
     } catch (error) {
       throw new DatabaseOperationFailException();
     }

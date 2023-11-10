@@ -6,6 +6,7 @@ import { Token } from '../entity/Token';
 import { User } from '../entity/User';
 import { UserAlreadyExistsException } from '../exception';
 import { AuthenticationFailedException } from '../exception/AuthenticationFailedException';
+import { PasswordChangeFailedException } from '../exception/PasswordChangeFailedException';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { TokenRepository } from '../repository/TokenRepository';
 import { UserRepository } from '../repository/UserRepository';
@@ -105,5 +106,36 @@ export class UserService {
         './template/ForgotPassword.handlebars'
       );
     }
+  }
+
+  /**
+   * Resets the user's password with a valid token.
+   *
+   * @param id - The id of the user resetting the password.
+   * @param newPassword - The new password the user desires.
+   * @param token - The token received via email.
+   *
+   * @throws {PasswordChangeFailedException} if password change fails.
+   */
+  public async resetPassword(id: number, newPassword: string, token: string): Promise<void> {
+    const tokenById: Token = await this.tokenRepository.findById(id);
+
+    if (!tokenById) throw new PasswordChangeFailedException();
+
+    const expiresIn = tokenById.createdAt.getTime() + 1800000;
+    const currentTime: number = new Date().getTime();
+
+    const tokenValid = currentTime < expiresIn;
+    const tokenMatch = await PasswordEncrypt.compare(token, tokenById.token);
+
+    if (!tokenMatch || !tokenValid) throw new PasswordChangeFailedException();
+
+    const newPasswordEncrypted: string = await PasswordEncrypt.encrypt(newPassword);
+
+    const user: User = await this.userRepository.getById(id);
+    user.password = newPasswordEncrypted;
+    await this.userRepository.save(user);
+
+    await this.tokenRepository.deleteById(id);
   }
 }

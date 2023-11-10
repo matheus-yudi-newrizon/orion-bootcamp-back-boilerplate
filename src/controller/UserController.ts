@@ -252,7 +252,7 @@ export class UserController {
    *                 success: true
    *                 message: The recovery email has been sent.
    *       '400':
-   *         description: Returns error (RequiredFieldException).
+   *         description: Returns RequiredFieldException.
    *         content:
    *           application/json:
    *             schema:
@@ -275,11 +275,120 @@ export class UserController {
       UserRequestValidator.validateUserEmail(email);
 
       await this.userService.forgotPassword(email);
-      const result: IControllerResponse<void> = { success: true, message: 'The recovery email has been sent.' };
+      const result: IControllerResponse<void> = {
+        success: true,
+        message: 'The recovery email has been sent.'
+      };
 
       res.status(200).json(result);
     } catch (error) {
-      const result: IControllerResponse<void> = { success: false, message: `${error.name}. ${error.message}` };
+      const result: IControllerResponse<void> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
+
+      res.status(statusCode).json(result);
+    }
+  }
+
+  /**
+   * @swagger
+   * /reset-password:
+   *   post:
+   *     summary: Reset user password.
+   *     tags: [Reset password]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               id:
+   *                 type: number
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *               token:
+   *                 type: string
+   *             example:
+   *               id: 10
+   *               password: 12345678aA!
+   *               confirmPassword: 12345678aA!
+   *               token: fjasdJDASAG43871233csafje
+   *     responses:
+   *       '200':
+   *         description: Returns that the password was changed successfully.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: true
+   *                 message: 'Password change successfully.'
+   *       '400':
+   *         description: Returns PasswordChangeFailedException.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'PasswordChangeFailedException: Password change failed.'
+   *       '500':
+   *         description: Returns Error.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'Type error: property was undefined'
+   */
+  public async resetPassword(req: Request, res: Response): Promise<void> {
+    try {
+      const { id, token, password, confirmPassword } = req.body;
+
+      if (!id) throw new RequiredFieldException('id');
+      if (!token) throw new RequiredFieldException('token');
+      if (!password) throw new RequiredFieldException('password');
+      if (!confirmPassword) throw new RequiredFieldException('confirmPassword');
+
+      UserRequestValidator.validateUserPassword(password, confirmPassword);
+
+      await this.userService.resetPassword(id, password, token);
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: true,
+        message: 'Password change successfully.'
+      };
+
+      res.status(200).json(result);
+    } catch (error) {
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
       res.status(statusCode).json(result);
