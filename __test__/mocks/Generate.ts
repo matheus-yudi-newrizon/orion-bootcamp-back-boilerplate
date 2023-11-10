@@ -24,6 +24,51 @@ export class Generate {
   }
 
   /**
+   * Generates a mock of login input.
+   *
+   * @param rememberMe - A flag indicating whether the session should be remembered. Default is `false`.
+   *
+   * @returns An object with the mocked data.
+   */
+  public loginInput(rememberMe: boolean = false) {
+    const { email, password } = this.userPostRequest();
+    const input = { email, password, rememberMe };
+
+    return input;
+  }
+
+  /**
+   * Generates a mock of forgot password input.
+   *
+   * @returns An object with the mocked data.
+   */
+  public forgotPasswordInput() {
+    const { email } = this.signUpInput();
+    const input = { email };
+
+    return input;
+  }
+
+  /**
+   * Generates a mock of reset password input.
+   *
+   * @returns An object with the mocked data.
+   */
+  public resetPasswordInput() {
+    const token: Token = this.tokenData();
+    const newPassword: string = 'foo.BARZ%$#';
+
+    const input = {
+      token: token.token,
+      id: token.id,
+      password: newPassword,
+      confirmPassword: newPassword
+    };
+
+    return input;
+  }
+
+  /**
    * Generates a mock of user post request.
    *
    * @returns A IUserPostRequest with the mocked data.
@@ -67,18 +112,6 @@ export class Generate {
   }
 
   /**
-   * Generates a mock of forgot password input.
-   *
-   * @returns An object with the mocked data.
-   */
-  public forgotPasswordInput() {
-    const { email } = this.signUpInput();
-    const input = { email };
-
-    return input;
-  }
-
-  /**
    * Generates a mock of token data.
    *
    * @returns A Token with the mocked data.
@@ -107,20 +140,6 @@ export class Generate {
     token.createdAt.setMinutes(token.createdAt.getMinutes() - 30);
 
     return token;
-  }
-
-  /**
-   * Generates a mock of login input.
-   *
-   * @param rememberMe - An optional flag indicating whether the session should be remembered.
-   *
-   * @returns An object with the mocked data.
-   */
-  public loginInput(rememberMe?: boolean) {
-    const { email, password } = this.userPostRequest();
-    const input = { email, password, rememberMe };
-
-    return input;
   }
 
   /**
