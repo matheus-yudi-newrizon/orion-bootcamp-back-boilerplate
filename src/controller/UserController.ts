@@ -195,6 +195,7 @@ export class UserController {
 
       if (!userCredentials.email) throw new RequiredFieldException('email');
       if (!userCredentials.password) throw new RequiredFieldException('password');
+      if (rememberMe == null) throw new RequiredFieldException('rememberMe');
 
       const loginResponse: LoginResponseDTO = await this.userService.login(userCredentials, rememberMe);
       const result: IControllerResponse<LoginResponseDTO> = {
