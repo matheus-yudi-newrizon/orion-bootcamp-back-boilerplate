@@ -1,6 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { Container } from 'typedi';
+import { LoginResponseDTO } from '../../src/dto/LoginResponseDTO';
 import {
   DatabaseOperationFailException,
   EmailNotValidException,
@@ -9,6 +10,8 @@ import {
   SendEmailFailException,
   UserAlreadyExistsException
 } from '../../src/exception';
+import { AuthenticationFailedException } from '../../src/exception/AuthenticationFailedException';
+import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 import routes from '../../src/routes';
 import { UserService } from '../../src/service/UserService';
 import { UserRequestValidator } from '../../src/validation/UserRequestValidator';
@@ -173,6 +176,87 @@ describe('UserController', () => {
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
       expect(spyCreateUser).toHaveBeenCalledWith(generate.userPostRequest());
       expect(spyCreateUser).toThrow(Error);
+      expect(response.statusCode).toBe(500);
+    });
+  });
+
+  describe('POST /login', () => {
+    it('should return 200 and the login response', async () => {
+      const loginInput = generate.loginInput();
+      const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+      const loginResponse: LoginResponseDTO = generate.loginResponse();
+
+      const spyLogin = jest.spyOn(userService, 'login').mockResolvedValue(loginResponse);
+
+      const response = await request(app).post('/login').send(loginInput);
+
+      expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({ success: true, message: 'Successful login.', data: loginResponse });
+    });
+
+    it('should return 400 and RequiredFieldException for email', async () => {
+      const loginInput = generate.loginInput();
+      loginInput.email = undefined;
+
+      const response = await request(app).post('/login').send(loginInput);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 400 and RequiredFieldException for password', async () => {
+      const loginInput = generate.loginInput();
+      loginInput.password = undefined;
+
+      const response = await request(app).post('/login').send(loginInput);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 401 and AuthenticationFailedException', async () => {
+      const loginInput = generate.loginInput();
+      const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+
+      const spyLogin = jest.spyOn(userService, 'login').mockImplementation(() => {
+        throw new AuthenticationFailedException();
+      });
+
+      const response = await request(app).post('/login').send(loginInput);
+
+      expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
+      expect(spyLogin).toThrow(AuthenticationFailedException);
+      expect(response.statusCode).toBe(401);
+    });
+
+    it('should return 500 and DatabaseOperationFailException', async () => {
+      const loginInput = generate.loginInput();
+      const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+
+      const spyLogin = jest.spyOn(userService, 'login').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      const response = await request(app).post('/login').send(loginInput);
+
+      expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
+      expect(spyLogin).toThrow(DatabaseOperationFailException);
+      expect(response.statusCode).toBe(500);
+    });
+
+    it('should return 500 and Error', async () => {
+      const loginInput = generate.loginInput();
+      const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+
+      const spyLogin = jest.spyOn(userService, 'login').mockImplementation(() => {
+        throw new Error();
+      });
+
+      const response = await request(app).post('/login').send(loginInput);
+
+      expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
+      expect(spyLogin).toThrow(Error);
       expect(response.statusCode).toBe(500);
     });
   });
