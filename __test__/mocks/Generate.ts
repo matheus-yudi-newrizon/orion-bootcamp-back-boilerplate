@@ -1,3 +1,4 @@
+import { LoginResponseDTO } from '../../src/dto/LoginResponseDTO';
 import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
 import { Token } from '../../src/entity/Token';
 import { User } from '../../src/entity/User';
@@ -29,7 +30,7 @@ export class Generate {
    */
   public userPostRequest(): IUserPostRequest {
     const { email, password } = this.signUpInput();
-    const userPostRequest: IUserPostRequest = { email: email, password: password };
+    const userPostRequest: IUserPostRequest = { email, password };
 
     return userPostRequest;
   }
@@ -71,9 +72,10 @@ export class Generate {
    * @returns An object with the mocked data.
    */
   public forgotPasswordInput() {
-    const input = this.signUpInput();
+    const { email } = this.signUpInput();
+    const input = { email };
 
-    return { email: input.email };
+    return input;
   }
 
   /**
@@ -105,5 +107,55 @@ export class Generate {
     token.createdAt.setMinutes(token.createdAt.getMinutes() - 30);
 
     return token;
+  }
+
+  /**
+   * Generates a mock of login input.
+   *
+   * @param rememberMe - An optional flag indicating whether the session should be remembered.
+   *
+   * @returns An object with the mocked data.
+   */
+  public loginInput(rememberMe?: boolean) {
+    const { email, password } = this.userPostRequest();
+    const input = { email, password, rememberMe };
+
+    return input;
+  }
+
+  /**
+   * Generates a mock of login response.
+   *
+   * @returns A LoginResponseDTO with the mocked data.
+   */
+  public loginResponse(): LoginResponseDTO {
+    const user: User = this.userData();
+    const jwt: string = this.encodedJwt();
+    const loginReponse: LoginResponseDTO = new LoginResponseDTO(user, jwt);
+
+    return loginReponse;
+  }
+
+  /**
+   * Generates a mock of encoded JWT data.
+   *
+   * @returns A string with the mocked data.
+   */
+  public encodedJwt(): string {
+    const jwt: string =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+    return jwt;
+  }
+
+  /**
+   * Generates a mock of hashed password.
+   *
+   * @returns A string with the mocked data.
+   */
+  public hashedPassword(): string {
+    const hashed: string = 'ABCDEF!@#$%iuojk_>,abc';
+
+    return hashed;
   }
 }
