@@ -12,6 +12,7 @@ export class TokenRepository {
    * Saves a new token in the database.
    *
    * @param token - The token entity to be saved.
+   *
    * @returns A promise that resolves with the saved token.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
@@ -28,6 +29,7 @@ export class TokenRepository {
    * Note that it copies only properties that are present in token schema.
    *
    * @param entityLike - An object containing properties to be copied into a new token instance.
+   *
    * @returns A new token instance with copied properties.
    * @throws {DatabaseOperationFailException} If the operation fails.
    */
@@ -44,6 +46,7 @@ export class TokenRepository {
    * If token was not found in the database - returns null.
    *
    * @param id - The id of the token to retrieve.
+   *
    * @returns A promise that resolves with the token if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
@@ -59,6 +62,7 @@ export class TokenRepository {
    * Deletes a token by a given id.
    *
    * @param id - The id of the token to remove.
+   *
    * @returns A promise that resolves with void.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
