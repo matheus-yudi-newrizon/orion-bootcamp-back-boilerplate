@@ -13,6 +13,7 @@ export class UserRepository {
    * If user does not exist in the database then inserts, otherwise updates.
    *
    * @param user - The user entity to be saved or updated.
+   *
    * @returns A promise that resolves with the saved or updated user.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
@@ -29,6 +30,7 @@ export class UserRepository {
    * If user was not found in the database - returns null.
    *
    * @param email - The email of the user to retrieve.
+   *
    * @returns A promise that resolves with the user if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
@@ -45,6 +47,7 @@ export class UserRepository {
    * If user was not found in the database - returns null.
    *
    * @param id - The id of the user to retrieve.
+   *
    * @returns A promise that resolves with the user if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
@@ -61,6 +64,7 @@ export class UserRepository {
    * Note that it copies only properties that are present in user schema.
    *
    * @param entityLike - An object containing properties to be copied into a new user instance.
+   *
    * @returns A new user instance with copied properties.
    * @throws {DatabaseOperationFailException} If the operation fails.
    */
@@ -73,14 +77,15 @@ export class UserRepository {
   }
 
   /**
-   * Updates a user by ID with the given data.
+   * Updates a user by id with the given data.
    *
-   * @param id - The ID of the user to update.
+   * @param id - The id of the user to update.
    * @param userData - The data to update.
+   *
    * @returns A promise that resolves with the update result.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
-  public async updateUser(id: number, userData: DeepPartial<User>): Promise<UpdateResult> {
+  public async update(id: number, userData: DeepPartial<User>): Promise<UpdateResult> {
     try {
       return await this.ormRepository.update(id, userData);
     } catch (error) {

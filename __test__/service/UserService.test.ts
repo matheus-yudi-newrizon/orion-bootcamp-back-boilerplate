@@ -1,10 +1,12 @@
 import { Container } from 'typedi';
+import { UpdateResult } from 'typeorm';
 import { LoginResponseDTO } from '../../src/dto/LoginResponseDTO';
 import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
 import { Token } from '../../src/entity/Token';
 import { User } from '../../src/entity/User';
 import { DatabaseOperationFailException, SendEmailFailException, UserAlreadyExistsException } from '../../src/exception';
 import { AuthenticationFailedException } from '../../src/exception/AuthenticationFailedException';
+import { PasswordChangeFailedException } from '../../src/exception/PasswordChangeFailedException';
 import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 import { TokenRepository } from '../../src/repository/TokenRepository';
 import { UserRepository } from '../../src/repository/UserRepository';
@@ -303,6 +305,112 @@ describe('UserService', () => {
       expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);
       expect(spySendEmail).toHaveBeenCalled();
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should reset the user password with a valid token', async () => {
+      const input = generate.resetPasswordInput();
+      const token: Token = generate.tokenData();
+      const hashed: string = generate.hashedPassword();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(hashed);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockResolvedValue();
+
+      await userService.resetPassword(input.id, input.password, input.token);
+
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+      expect(spyEncrypt).toHaveBeenCalled();
+      expect(spyUpdate).toHaveBeenCalledWith(input.id, { password: hashed });
+      expect(spyDeleteById).toHaveBeenCalledWith(input.id);
+    });
+
+    it('should throw PasswordChangeFailedException if the token was not found in the database', async () => {
+      const input = generate.resetPasswordInput();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(null);
+
+      await expect(userService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(PasswordChangeFailedException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+    });
+
+    it('should throw PasswordChangeFailedException if the token found in database is not valid', async () => {
+      const input = generate.resetPasswordInput();
+      const expiredToken: Token = generate.expiredTokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(expiredToken);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+
+      await expect(userService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(PasswordChangeFailedException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, expiredToken.token);
+    });
+
+    it('should throw PasswordChangeFailedException if the token found in database does not match', async () => {
+      const input = generate.resetPasswordInput();
+      const token: Token = generate.expiredTokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(false);
+
+      await expect(userService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(PasswordChangeFailedException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+    });
+
+    it('should throw DatabaseOperationFailException if operation fails while finding token by id', async () => {
+      const input = generate.resetPasswordInput();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(userService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+    });
+
+    it('should throw DatabaseOperationFailException if operation fails while updating user', async () => {
+      const input = generate.resetPasswordInput();
+      const token: Token = generate.tokenData();
+      const hashed: string = generate.hashedPassword();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(hashed);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(userService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+      expect(spyEncrypt).toHaveBeenCalled();
+      expect(spyUpdate).toHaveBeenCalledWith(input.id, { password: hashed });
+    });
+
+    it('should throw DatabaseOperationFailException if operation fails while deleting token', async () => {
+      const input = generate.resetPasswordInput();
+      const token: Token = generate.tokenData();
+      const hashed: string = generate.hashedPassword();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyEncrypt = jest.spyOn(PasswordEncrypt, 'encrypt').mockResolvedValue(hashed);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(userService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+      expect(spyEncrypt).toHaveBeenCalled();
+      expect(spyUpdate).toHaveBeenCalledWith(input.id, { password: hashed });
+      expect(spyDeleteById).toHaveBeenCalledWith(input.id);
     });
   });
 });

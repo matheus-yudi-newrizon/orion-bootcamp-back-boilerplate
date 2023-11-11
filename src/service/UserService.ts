@@ -115,6 +115,7 @@ export class UserService {
    * @param newPassword - The new password the user desires.
    * @param token - The token received via email.
    *
+   * @throws {DatabaseOperationFailException} if there is a database operation failure.
    * @throws {PasswordChangeFailedException} if password change fails.
    */
   public async resetPassword(id: number, newPassword: string, token: string): Promise<void> {
@@ -132,10 +133,7 @@ export class UserService {
 
     const newPasswordEncrypted: string = await PasswordEncrypt.encrypt(newPassword);
 
-    const user: User = await this.userRepository.getById(id);
-    user.password = newPasswordEncrypted;
-    await this.userRepository.save(user);
-
+    await this.userRepository.update(id, { password: newPasswordEncrypted });
     await this.tokenRepository.deleteById(id);
   }
 }
