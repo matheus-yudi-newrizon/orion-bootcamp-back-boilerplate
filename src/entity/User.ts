@@ -12,10 +12,10 @@ export class User {
   @Column({ length: 100 })
   password: string;
 
-  @Column()
+  @Column({ default: 0 })
   login: number;
 
-  @Column()
+  @Column({ default: 0 })
   score: number;
 
   @CreateDateColumn()
@@ -28,5 +28,5 @@ export class User {
   deletedAt: Date;
 
   @OneToMany(() => Game, game => game.user)
-  games: Game[];
+  games?: Game[];
 }
