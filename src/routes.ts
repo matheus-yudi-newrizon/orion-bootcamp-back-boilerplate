@@ -1,16 +1,16 @@
 import { Router } from 'express';
 import { Container } from 'typedi';
-import { UserController } from './controller/UserController';
+import { AuthController } from './controller/AuthController';
 
 const router = Router();
 
-const userController: UserController = Container.get(UserController);
+const authController: AuthController = Container.get(AuthController);
 
 router.get('/ping', (_req, res) => res.send('pong'));
 
-router.post('/signup', (req, res) => userController.signup(req, res));
-router.post('/login', (req, res) => userController.login(req, res));
-router.post('/reset-password', (req, res) => userController.resetPassword(req, res));
-router.post('/forgot-password', (req, res) => userController.forgotPassword(req, res));
+router.post('/auth/signup', (req, res) => authController.signup(req, res));
+router.post('/auth/login', (req, res) => authController.login(req, res));
+router.post('/auth/reset-password', (req, res) => authController.resetPassword(req, res));
+router.post('/auth/forgot-password', (req, res) => authController.forgotPassword(req, res));
 
 export default router;
