@@ -7,10 +7,14 @@ import { IControllerResponse } from '../interface/IControllerResponse';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
+import { GameRepository } from 'repository/GameRepository';
 
 @Controller()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly gameRepository: GameRepository
+  ) {}
 
   /**
    * @swagger
@@ -195,9 +199,14 @@ export class UserController {
 
       if (!userCredentials.email) throw new RequiredFieldException('email');
       if (!userCredentials.password) throw new RequiredFieldException('password');
-      if (rememberMe == null) throw new RequiredFieldException('rememberMe');
 
       const loginResponse: LoginResponseDTO = await this.userService.login(userCredentials, rememberMe);
+
+      if (loginResponse.id) {
+        const activeGame = await this.gameRepository.getActiveGameByUserId(loginResponse.id);
+        loginResponse.game = activeGame;
+      }
+
       const result: IControllerResponse<LoginResponseDTO> = {
         success: true,
         message: 'Successful login.',
@@ -215,7 +224,6 @@ export class UserController {
       res.status(statusCode).json(result);
     }
   }
-
   /**
    * @swagger
    * /forgot-password:
