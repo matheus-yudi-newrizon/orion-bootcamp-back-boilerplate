@@ -92,6 +92,8 @@ export class Generate {
       id: 1,
       email: userPostRequest.email,
       password: userPostRequest.password,
+      login: 0,
+      record: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: new Date()
