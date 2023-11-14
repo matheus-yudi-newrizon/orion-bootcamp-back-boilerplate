@@ -19,7 +19,7 @@ export class Game {
   combo: number;
 
   @Column()
-  ended: boolean;
+  isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

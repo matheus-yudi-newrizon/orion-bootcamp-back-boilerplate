@@ -18,5 +18,5 @@ export class GameReview {
   answer: string;
 
   @Column()
-  success: boolean;
+  isCorrect: boolean;
 }
