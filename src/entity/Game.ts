@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Review } from './Review';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from './User';
 
 @Entity()
@@ -27,8 +26,4 @@ export class Game {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
-  @ManyToMany(() => Review)
-  @JoinTable()
-  reviews: Review[];
 }
