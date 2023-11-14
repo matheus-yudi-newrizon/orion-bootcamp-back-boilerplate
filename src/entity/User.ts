@@ -16,7 +16,7 @@ export class User {
   login: number;
 
   @Column({ default: 0 })
-  score: number;
+  record: number;
 
   @CreateDateColumn()
   createdAt: Date;
