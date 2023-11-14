@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Game } from './Game';
 import { Review } from './Review';
 
@@ -19,4 +19,7 @@ export class GameReview {
 
   @Column()
   isCorrect: boolean;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }
