@@ -14,6 +14,7 @@ import { AuthenticationFailedException } from '../../src/exception/Authenticatio
 import { PasswordChangeFailedException } from '../../src/exception/PasswordChangeFailedException';
 import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
 import routes from '../../src/routes';
+import { AuthService } from '../../src/service/AuthService';
 import { UserService } from '../../src/service/UserService';
 import { UserRequestValidator } from '../../src/validation/UserRequestValidator';
 import { Generate } from '../mocks/Generate';
@@ -23,10 +24,12 @@ app.use(express.json());
 app.use(routes);
 
 const userService = Container.get(UserService);
+const authService = Container.get(AuthService);
+
 const generate = new Generate();
 
-describe('UserController', () => {
-  describe('POST /signup', () => {
+describe('AuthController', () => {
+  describe('POST /auth/signup', () => {
     it('should return 201 and the user created', async () => {
       const user = generate.signUpInput();
 
@@ -34,7 +37,7 @@ describe('UserController', () => {
       const spyValidateUserPassword = jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
       const spyCreateUser = jest.spyOn(userService, 'createUser').mockResolvedValue(generate.userPayload());
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
@@ -47,7 +50,7 @@ describe('UserController', () => {
       const user = generate.signUpInput();
       user.email = undefined;
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -57,7 +60,7 @@ describe('UserController', () => {
       const user = generate.signUpInput();
       user.password = undefined;
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -67,7 +70,7 @@ describe('UserController', () => {
       const user = generate.signUpInput();
       user.confirmPassword = undefined;
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -81,7 +84,7 @@ describe('UserController', () => {
         throw new EmailNotValidException();
       });
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserEmail).toThrow(EmailNotValidException);
@@ -98,7 +101,7 @@ describe('UserController', () => {
         throw new PasswordNotValidException();
       });
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
@@ -116,7 +119,7 @@ describe('UserController', () => {
         throw new PasswordMismatchException();
       });
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
@@ -134,7 +137,7 @@ describe('UserController', () => {
         throw new UserAlreadyExistsException(user.email);
       });
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
@@ -153,7 +156,7 @@ describe('UserController', () => {
         throw new DatabaseOperationFailException();
       });
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
@@ -171,7 +174,7 @@ describe('UserController', () => {
         throw new Error('Internal Server Error.');
       });
 
-      const response = await request(app).post('/signup').send(user);
+      const response = await request(app).post('/auth/signup').send(user);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(user.email);
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
@@ -181,15 +184,15 @@ describe('UserController', () => {
     });
   });
 
-  describe('POST /login', () => {
+  describe('POST /auth/login', () => {
     it('should return 200 and the login response', async () => {
       const loginInput = generate.loginInput();
       const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
       const loginResponse: LoginResponseDTO = generate.loginResponse();
 
-      const spyLogin = jest.spyOn(userService, 'login').mockResolvedValue(loginResponse);
+      const spyLogin = jest.spyOn(authService, 'login').mockResolvedValue(loginResponse);
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
       expect(response.statusCode).toBe(200);
@@ -200,7 +203,7 @@ describe('UserController', () => {
       const loginInput = generate.loginInput();
       loginInput.email = undefined;
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -210,7 +213,7 @@ describe('UserController', () => {
       const loginInput = generate.loginInput();
       loginInput.password = undefined;
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -220,7 +223,7 @@ describe('UserController', () => {
       const loginInput = generate.loginInput();
       loginInput.rememberMe = undefined;
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -230,11 +233,11 @@ describe('UserController', () => {
       const loginInput = generate.loginInput();
       const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
 
-      const spyLogin = jest.spyOn(userService, 'login').mockImplementation(() => {
+      const spyLogin = jest.spyOn(authService, 'login').mockImplementation(() => {
         throw new AuthenticationFailedException();
       });
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
       expect(spyLogin).toThrow(AuthenticationFailedException);
@@ -245,11 +248,11 @@ describe('UserController', () => {
       const loginInput = generate.loginInput();
       const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
 
-      const spyLogin = jest.spyOn(userService, 'login').mockImplementation(() => {
+      const spyLogin = jest.spyOn(authService, 'login').mockImplementation(() => {
         throw new DatabaseOperationFailException();
       });
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
       expect(spyLogin).toThrow(DatabaseOperationFailException);
@@ -260,11 +263,11 @@ describe('UserController', () => {
       const loginInput = generate.loginInput();
       const userCredentials: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
 
-      const spyLogin = jest.spyOn(userService, 'login').mockImplementation(() => {
+      const spyLogin = jest.spyOn(authService, 'login').mockImplementation(() => {
         throw new Error();
       });
 
-      const response = await request(app).post('/login').send(loginInput);
+      const response = await request(app).post('/auth/login').send(loginInput);
 
       expect(spyLogin).toHaveBeenCalledWith(userCredentials, loginInput.rememberMe);
       expect(spyLogin).toThrow(Error);
@@ -272,14 +275,14 @@ describe('UserController', () => {
     });
   });
 
-  describe('POST /forgot-password', () => {
+  describe('POST /auth/forgot-password', () => {
     it('should return 200 and success true', async () => {
       const userRequest = generate.forgotPasswordInput();
 
       const spyValidateUserEmail = jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
-      const spyForgotPassword = jest.spyOn(userService, 'forgotPassword').mockResolvedValue();
+      const spyForgotPassword = jest.spyOn(authService, 'forgotPassword').mockResolvedValue();
 
-      const response = await request(app).post('/forgot-password').send(userRequest);
+      const response = await request(app).post('/auth/forgot-password').send(userRequest);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(userRequest.email);
       expect(spyForgotPassword).toHaveBeenCalledWith(userRequest.email);
@@ -288,7 +291,7 @@ describe('UserController', () => {
     });
 
     it('should return 400 and RequiredFieldException for email', async () => {
-      const response = await request(app).post('/forgot-password').send();
+      const response = await request(app).post('/auth/forgot-password').send();
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -302,7 +305,7 @@ describe('UserController', () => {
         throw new EmailNotValidException();
       });
 
-      const response = await request(app).post('/forgot-password').send(userRequest);
+      const response = await request(app).post('/auth/forgot-password').send(userRequest);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(userRequest.email);
       expect(spyValidateUserEmail).toThrow(EmailNotValidException);
@@ -314,11 +317,11 @@ describe('UserController', () => {
       const userRequest = generate.forgotPasswordInput();
 
       const spyValidateUserEmail = jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
-      const spyForgotPassword = jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
+      const spyForgotPassword = jest.spyOn(authService, 'forgotPassword').mockImplementation(() => {
         throw new SendEmailFailException('Failed sending email.');
       });
 
-      const response = await request(app).post('/forgot-password').send(userRequest);
+      const response = await request(app).post('/auth/forgot-password').send(userRequest);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(userRequest.email);
       expect(spyForgotPassword).toHaveBeenCalledWith(userRequest.email);
@@ -330,11 +333,11 @@ describe('UserController', () => {
       const userRequest = generate.forgotPasswordInput();
 
       const spyValidateUserEmail = jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
-      const spyForgotPassword = jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
+      const spyForgotPassword = jest.spyOn(authService, 'forgotPassword').mockImplementation(() => {
         throw new DatabaseOperationFailException();
       });
 
-      const response = await request(app).post('/forgot-password').send(userRequest);
+      const response = await request(app).post('/auth/forgot-password').send(userRequest);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(userRequest.email);
       expect(spyForgotPassword).toHaveBeenCalledWith(userRequest.email);
@@ -346,11 +349,11 @@ describe('UserController', () => {
       const userRequest = generate.forgotPasswordInput();
 
       const spyValidateUserEmail = jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
-      const spyForgotPassword = jest.spyOn(userService, 'forgotPassword').mockImplementation(() => {
+      const spyForgotPassword = jest.spyOn(authService, 'forgotPassword').mockImplementation(() => {
         throw new Error('Internal Server Error.');
       });
 
-      const response = await request(app).post('/forgot-password').send(userRequest);
+      const response = await request(app).post('/auth/forgot-password').send(userRequest);
 
       expect(spyValidateUserEmail).toHaveBeenCalledWith(userRequest.email);
       expect(spyForgotPassword).toHaveBeenCalledWith(userRequest.email);
@@ -359,14 +362,14 @@ describe('UserController', () => {
     });
   });
 
-  describe('POST /reset-password', () => {
+  describe('POST /auth/reset-password', () => {
     it('should return 200 and success true', async () => {
       const userRequest = generate.resetPasswordInput();
 
       const spyValidateUserPassword = jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
-      const spyResetPassword = jest.spyOn(userService, 'resetPassword').mockResolvedValue();
+      const spyResetPassword = jest.spyOn(authService, 'resetPassword').mockResolvedValue();
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(spyValidateUserPassword).toHaveBeenCalledWith(userRequest.password, userRequest.confirmPassword);
       expect(spyResetPassword).toHaveBeenCalledWith(userRequest.id, userRequest.password, userRequest.token);
@@ -378,7 +381,7 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
       userRequest.id = undefined;
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -388,7 +391,7 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
       userRequest.token = undefined;
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -398,7 +401,7 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
       userRequest.password = undefined;
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -408,7 +411,7 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
       userRequest.confirmPassword = undefined;
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.success).toBe(false);
@@ -422,7 +425,7 @@ describe('UserController', () => {
         throw new PasswordNotValidException();
       });
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(spyValidateUserPassword).toHaveBeenCalledWith(userRequest.password, userRequest.confirmPassword);
       expect(spyValidateUserPassword).toThrow(PasswordNotValidException);
@@ -438,7 +441,7 @@ describe('UserController', () => {
         throw new PasswordMismatchException();
       });
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(spyValidateUserPassword).toHaveBeenCalledWith(userRequest.password, userRequest.confirmPassword);
       expect(spyValidateUserPassword).toThrow(PasswordMismatchException);
@@ -450,11 +453,11 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
 
       const spyValidateUserPassword = jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
-      const spyResetPassword = jest.spyOn(userService, 'resetPassword').mockImplementation(() => {
+      const spyResetPassword = jest.spyOn(authService, 'resetPassword').mockImplementation(() => {
         throw new PasswordChangeFailedException();
       });
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(spyValidateUserPassword).toHaveBeenCalledWith(userRequest.password, userRequest.confirmPassword);
       expect(spyResetPassword).toHaveBeenCalledWith(userRequest.id, userRequest.password, userRequest.token);
@@ -466,11 +469,11 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
 
       const spyValidateUserPassword = jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
-      const spyResetPassword = jest.spyOn(userService, 'resetPassword').mockImplementation(() => {
+      const spyResetPassword = jest.spyOn(authService, 'resetPassword').mockImplementation(() => {
         throw new DatabaseOperationFailException();
       });
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(spyValidateUserPassword).toHaveBeenCalledWith(userRequest.password, userRequest.confirmPassword);
       expect(spyResetPassword).toHaveBeenCalledWith(userRequest.id, userRequest.password, userRequest.token);
@@ -482,11 +485,11 @@ describe('UserController', () => {
       const userRequest = generate.resetPasswordInput();
 
       const spyValidateUserPassword = jest.spyOn(UserRequestValidator, 'validateUserPassword').mockReturnValueOnce();
-      const spyResetPassword = jest.spyOn(userService, 'resetPassword').mockImplementation(() => {
+      const spyResetPassword = jest.spyOn(authService, 'resetPassword').mockImplementation(() => {
         throw new Error();
       });
 
-      const response = await request(app).post('/reset-password').send(userRequest);
+      const response = await request(app).post('/auth/reset-password').send(userRequest);
 
       expect(spyValidateUserPassword).toHaveBeenCalledWith(userRequest.password, userRequest.confirmPassword);
       expect(spyResetPassword).toHaveBeenCalledWith(userRequest.id, userRequest.password, userRequest.token);
