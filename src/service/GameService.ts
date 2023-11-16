@@ -20,6 +20,7 @@ export class GameService {
    * @param userId - The id of the user that requested a new game.
    *
    * @returns A promise that resolves with the created game.
+   * @throws {JsonWebTokenError} if the user was not found in database.
    * @throws {GameIsActiveException} if the user has an active game.
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
