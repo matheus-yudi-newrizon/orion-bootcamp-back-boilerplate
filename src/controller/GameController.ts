@@ -4,7 +4,7 @@ import { Service as Controller } from 'typedi';
 import { GameResponseDTO } from '../dto/GameResponseDTO';
 import { BusinessException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
-import { ICustomRequest } from '../middleware/ValidateJwt';
+import { ICustomRequest } from '../interface/ICustomRequest';
 import { GameService } from '../service/GameService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
@@ -18,10 +18,10 @@ export class GameController {
    *   post:
    *     summary: Register a new game.
    *     tags: [New game]
-   *     consumes:
-   *       - application/json
    *     produces:
    *       - application/json
+   *     security:
+   *       - bearerAuth: []
    *     responses:
    *       '200':
    *         description: Returns a new game created in the database.
