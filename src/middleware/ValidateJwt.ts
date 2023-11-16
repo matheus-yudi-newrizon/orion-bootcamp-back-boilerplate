@@ -1,16 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
-import { JwtPayload } from 'jsonwebtoken';
+import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
 import { IControllerResponse } from '../interface/IControllerResponse';
+import { ICustomRequest } from '../interface/ICustomRequest';
 import { JwtService } from '../security/JwtService';
 
-export interface ICustomRequest extends Request {
-  token: JwtPayload;
-}
-
+/**
+ * Middleware to validate the JWT contained in requests for protected routes.
+ */
 export function validateJwt(req: Request, res: Response, next: NextFunction) {
-  const bearerHeader: string = req.headers['authorization'];
-
   try {
+    const bearerHeader: string = req.headers['authorization'];
+    if (!bearerHeader) throw new JsonWebTokenError('invalid token.');
+
     const bearer: string[] = bearerHeader.split(' ');
     const token: string = bearer[1];
     const jwtPayload = JwtService.verifyToken(token);
