@@ -5,16 +5,20 @@ import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
+import { AuthService } from '../service/AuthService';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
 @Controller()
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+export class AuthController {
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService
+  ) {}
 
   /**
    * @swagger
-   * /signup:
+   * /auth/signup:
    *   post:
    *     summary: Register a new user.
    *     tags: [Sign up]
@@ -112,7 +116,7 @@ export class UserController {
 
   /**
    * @swagger
-   * /login:
+   * /auth/login:
    *   post:
    *     summary: Login an authenticated user.
    *     tags: [Login]
@@ -197,8 +201,8 @@ export class UserController {
       if (!userCredentials.password) throw new RequiredFieldException('password');
       if (rememberMe == null) throw new RequiredFieldException('rememberMe');
 
-      const loginResponse: LoginResponseDTO = await this.userService.login(userCredentials, rememberMe);
-      const result: IControllerResponse<LoginResponseDTO> = {
+      const loginResponse: LoginResponseDTO = await this.authService.login(userCredentials, rememberMe);
+      const result: IControllerResponse<typeof loginResponse> = {
         success: true,
         message: 'Successful login.',
         data: loginResponse
@@ -218,7 +222,7 @@ export class UserController {
 
   /**
    * @swagger
-   * /forgot-password:
+   * /auth/forgot-password:
    *   post:
    *     summary: Request an email to recover password.
    *     tags: [Forgot password]
@@ -275,7 +279,7 @@ export class UserController {
 
       UserRequestValidator.validateUserEmail(email);
 
-      await this.userService.forgotPassword(email);
+      await this.authService.forgotPassword(email);
       const result: IControllerResponse<void> = {
         success: true,
         message: 'The recovery email has been sent.'
@@ -295,7 +299,7 @@ export class UserController {
 
   /**
    * @swagger
-   * /reset-password:
+   * /auth/reset-password:
    *   post:
    *     summary: Reset user password.
    *     tags: [Reset password]
@@ -378,7 +382,7 @@ export class UserController {
 
       UserRequestValidator.validateUserPassword(password, confirmPassword);
 
-      await this.userService.resetPassword(id, password, token);
+      await this.authService.resetPassword(id, password, token);
       const result: IControllerResponse<UserResponseDTO> = {
         success: true,
         message: 'Password change successfully.'
