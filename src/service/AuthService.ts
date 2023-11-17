@@ -1,5 +1,4 @@
 import * as crypto from 'crypto';
-import { GameRepository } from 'repository/GameRepository';
 import { Service } from 'typedi';
 import { LoginResponseDTO } from '../dto/LoginResponseDTO';
 import { Game } from '../entity/Game';
@@ -8,6 +7,7 @@ import { User } from '../entity/User';
 import { AuthenticationFailedException } from '../exception/AuthenticationFailedException';
 import { PasswordChangeFailedException } from '../exception/PasswordChangeFailedException';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
+import { GameRepository } from '../repository/GameRepository';
 import { TokenRepository } from '../repository/TokenRepository';
 import { UserRepository } from '../repository/UserRepository';
 import { JwtService } from '../security/JwtService';
