@@ -1,9 +1,9 @@
-import { JsonWebTokenError } from 'jsonwebtoken';
 import { Service } from 'typedi';
 import { GameResponseDTO } from '../dto/GameResponseDTO';
 import { Game } from '../entity/Game';
 import { User } from '../entity/User';
 import { GameIsActiveException } from '../exception/GameIsActiveException';
+import { UserNotFoundException } from '../exception/UserNotFoundException';
 import { GameRepository } from '../repository/GameRepository';
 import { UserRepository } from '../repository/UserRepository';
 
@@ -26,7 +26,7 @@ export class GameService {
    */
   public async createGame(userId: number): Promise<GameResponseDTO> {
     const user: User = await this.userRepository.getById(userId);
-    if (!user) throw new JsonWebTokenError('invalid token.');
+    if (!user) throw new UserNotFoundException();
 
     const gameByUserId: Game = await this.gameRepository.getActiveGameByUser(user);
     if (gameByUserId) throw new GameIsActiveException();
