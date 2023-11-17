@@ -11,12 +11,14 @@ import { UserRepository } from '../repository/UserRepository';
 import { JwtService } from '../security/JwtService';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
 import { EmailService } from '../utils/EmailService';
+import { GameRepository } from 'repository/GameRepository';
 
 @Service()
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly tokenRepository: TokenRepository
+    private readonly tokenRepository: TokenRepository,
+    private readonly gameRepository: GameRepository
   ) {}
 
   /**
@@ -36,10 +38,12 @@ export class AuthService {
     const validPassword = await PasswordEncrypt.compare(userDTO.password, user.password);
     if (!validPassword) throw new AuthenticationFailedException();
 
+    const activeGame = await this.gameRepository.getActiveGameByUserId(user.id);
+
     const expiresIn = rememberMe ? undefined : '5h';
     const token = JwtService.generateToken({ id: user.id, email: user.email }, expiresIn);
 
-    return new LoginResponseDTO(user, token);
+    return new LoginResponseDTO(user, token, activeGame);
   }
 
   /**
