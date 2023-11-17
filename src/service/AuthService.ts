@@ -1,6 +1,8 @@
 import * as crypto from 'crypto';
+import { GameRepository } from 'repository/GameRepository';
 import { Service } from 'typedi';
 import { LoginResponseDTO } from '../dto/LoginResponseDTO';
+import { Game } from '../entity/Game';
 import { Token } from '../entity/Token';
 import { User } from '../entity/User';
 import { AuthenticationFailedException } from '../exception/AuthenticationFailedException';
@@ -16,7 +18,8 @@ import { EmailService } from '../utils/EmailService';
 export class AuthService {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly tokenRepository: TokenRepository
+    private readonly tokenRepository: TokenRepository,
+    private readonly gameRepository: GameRepository
   ) {}
 
   /**
@@ -36,10 +39,12 @@ export class AuthService {
     const validPassword = await PasswordEncrypt.compare(userDTO.password, user.password);
     if (!validPassword) throw new AuthenticationFailedException();
 
+    const activeGame: Game = await this.gameRepository.getActiveGameByUser(user);
+
     const expiresIn = rememberMe ? undefined : '5h';
     const token = JwtService.generateToken({ id: user.id, email: user.email }, expiresIn);
 
-    return new LoginResponseDTO(user, token);
+    return new LoginResponseDTO(user, token, activeGame);
   }
 
   /**
