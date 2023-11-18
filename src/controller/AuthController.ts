@@ -202,7 +202,7 @@ export class AuthController {
       if (rememberMe == null) throw new RequiredFieldException('rememberMe');
 
       const loginResponse: LoginResponseDTO = await this.authService.login(userCredentials, rememberMe);
-      const result: IControllerResponse<typeof loginResponse> = {
+      const result: IControllerResponse<LoginResponseDTO> = {
         success: true,
         message: 'Successful login.',
         data: loginResponse
