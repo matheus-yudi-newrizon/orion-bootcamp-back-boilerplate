@@ -19,7 +19,7 @@ export class MovieService {
    */
   public async searchMoviesByTitle(title: string): Promise<MovieDTO[]> {
     const filteredMovies: Movie[] = await this.movieRepository.getByTitle(title);
-    if (!filteredMovies) throw new MovieNotFoundException();
+    if (filteredMovies.length === 0) throw new MovieNotFoundException();
 
     const movies: MovieDTO[] = filteredMovies.map(movie => new MovieDTO(movie));
     return movies;

@@ -4,6 +4,7 @@ import { MovieDTO } from '../dto/MovieDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { MovieService } from '../service/MovieService';
+import { InsufficientLengthException } from '../exception/InsufficientLengthException';
 
 @Controller()
 export class MovieController {
@@ -43,7 +44,7 @@ export class MovieController {
    *                 message:
    *                   type: string
    *                 data:
-   *                   type: object
+   *                   type: array
    *                   properties:
    *                     title:
    *                       type: string
@@ -78,6 +79,7 @@ export class MovieController {
       const { title } = req.body;
 
       if (!title) throw new RequiredFieldException('title');
+      if (title.length < 4) throw new InsufficientLengthException('title', 4);
 
       const movies: MovieDTO[] = await this.movieService.searchMoviesByTitle(title);
       const result: IControllerResponse<MovieDTO[]> = {
