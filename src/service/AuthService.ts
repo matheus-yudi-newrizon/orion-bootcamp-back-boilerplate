@@ -11,7 +11,7 @@ import { UserRepository } from '../repository/UserRepository';
 import { JwtService } from '../security/JwtService';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
 import { EmailService } from '../utils/EmailService';
-import { GameRepository } from 'repository/GameRepository';
+import { GameRepository } from '../repository/GameRepository';
 
 @Service()
 export class AuthService {
