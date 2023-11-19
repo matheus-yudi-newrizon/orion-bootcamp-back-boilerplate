@@ -4,7 +4,10 @@ import { MovieDTO } from '../dto/MovieDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { MovieService } from '../service/MovieService';
+<<<<<<< HEAD
 import { InsufficientLengthException } from '../exception/InsufficientLengthException';
+=======
+>>>>>>> 37f09a8a69b35c8e9f22e4308f828f79b4da2a2a
 
 @Controller()
 export class MovieController {
@@ -44,7 +47,11 @@ export class MovieController {
    *                 message:
    *                   type: string
    *                 data:
+<<<<<<< HEAD
    *                   type: array
+=======
+   *                   type: object
+>>>>>>> 37f09a8a69b35c8e9f22e4308f828f79b4da2a2a
    *                   properties:
    *                     title:
    *                       type: string
@@ -79,7 +86,10 @@ export class MovieController {
       const { title } = req.body;
 
       if (!title) throw new RequiredFieldException('title');
+<<<<<<< HEAD
       if (title.length < 4) throw new InsufficientLengthException('title', 4);
+=======
+>>>>>>> 37f09a8a69b35c8e9f22e4308f828f79b4da2a2a
 
       const movies: MovieDTO[] = await this.movieService.searchMoviesByTitle(title);
       const result: IControllerResponse<MovieDTO[]> = {

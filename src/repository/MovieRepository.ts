@@ -19,12 +19,16 @@ export class MovieRepository {
    */
   public async getByTitle(title: string): Promise<Movie[] | null> {
     try {
+<<<<<<< HEAD
       return await this.ormRepository.find({
         where: {
           title: Like(`%${title}%`)
         },
         take: 5
       });
+=======
+      return await this.ormRepository.findBy({ title: Like(`%${title}%`) });
+>>>>>>> 37f09a8a69b35c8e9f22e4308f828f79b4da2a2a
     } catch (error) {
       throw new DatabaseOperationFailException();
     }
