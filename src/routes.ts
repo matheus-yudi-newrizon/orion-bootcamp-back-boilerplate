@@ -18,7 +18,7 @@ router.post('/auth/login', (req, res) => authController.login(req, res));
 router.post('/auth/reset-password', (req, res) => authController.resetPassword(req, res));
 router.post('/auth/forgot-password', (req, res) => authController.forgotPassword(req, res));
 
-router.get('/movies/title', (req, res) => movieController.searchMovies(req, res));
+router.get('/movies/title', validateJwt, (req, res) => movieController.searchMovies(req, res));
 router.post('/games/new', validateJwt, (req, res) => gameController.newGame(req, res));
 
 export default router;
