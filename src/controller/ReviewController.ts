@@ -51,7 +51,7 @@ export class ReviewController {
    *                   title: "Ahh, the magic begins."
    *                   text: "Harry Potter is an Orphan who on his eleventh birthday discovers he's a wizard and is called to term at Hogwarts School. But Harry is soon to find out that his past, and his destiny, is a truly remarkable, magical, and terrifying thing.\r\n\r\nHarry Potter And The Philosopher's Stone arrived in a blaze of publicity, one of the most hyped and talked about motion pictures of the decade had finally arrived."
    *       '400':
-   *         description: Returns UserNotFoundException.
+   *         description: Returns EntityNotFoundException.
    *         content:
    *           application/json:
    *             schema:
@@ -63,7 +63,7 @@ export class ReviewController {
    *                   type: string
    *               example:
    *                 success: false
-   *                 message: 'UserNotFoundException. The user was not found in database.'
+   *                 message: 'EntityNotFoundException. The user was not found in database.'
    */
   public async getReview(req: Request, res: Response): Promise<void> {
     try {
