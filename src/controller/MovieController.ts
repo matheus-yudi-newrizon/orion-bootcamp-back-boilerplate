@@ -55,10 +55,13 @@ export class MovieController {
    *               example:
    *                 success: true
    *                 message: 'Found film successfully'
-   *                 data:
-   *                   title: 'Harry Potter and the Chamber of Secrets'
-   *                   posterPath: /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg
-   *                   releaseDate: 2002-11-13
+   *                 data: [
+   *                    {
+   *                   "title": 'Harry Potter and the Chamber of Secrets',
+   *                   "posterPath": /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg,
+   *                   "releaseDate": 2002-11-13
+   *                  }
+   *              ]
    *       '400':
    *         description: Returns MovieNotFoundException.
    *         content:
