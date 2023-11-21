@@ -1,6 +1,6 @@
 import fs from 'fs';
 import handlebars from 'handlebars';
-import nodemailer, { SentMessageInfo, TestAccount, Transporter } from 'nodemailer';
+import nodemailer, { SentMessageInfo, Transporter } from 'nodemailer';
 import path from 'path';
 import { Service } from 'typedi';
 import { SendEmailFailException } from '../exception';
@@ -22,34 +22,32 @@ export class EmailService {
    * @throws {SendEmailFailException} if there is a failure sending email.
    */
   public static async sendEmail(email: string, subject: string, payload: unknown, template: string): Promise<void> {
-    nodemailer.createTestAccount((error: Error, account: TestAccount) => {
+    const transporter: Transporter = nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+
+    const source: string = fs.readFileSync(path.join(__dirname, template), 'utf8');
+    const compiledTemplate = handlebars.compile(source);
+
+    const options = {
+      from: process.env.EMAIL_USERNAME,
+      to: email,
+      subject: subject,
+      html: compiledTemplate(payload)
+    };
+
+    transporter.verify(function (error: Error) {
+      if (error) throw new SendEmailFailException(error.message);
+    });
+
+    transporter.sendMail(options, (error: Error, info: SentMessageInfo) => {
       if (error) throw new SendEmailFailException(error.message);
 
-      const transporter: Transporter = nodemailer.createTransport({
-        host: account.smtp.host,
-        port: account.smtp.port,
-        secure: account.smtp.secure,
-        auth: {
-          user: account.user,
-          pass: account.pass
-        }
-      });
-
-      const source: string = fs.readFileSync(path.join(__dirname, template), 'utf8');
-      const compiledTemplate = handlebars.compile(source);
-
-      const message = {
-        from: account.user,
-        to: email,
-        subject: subject,
-        html: compiledTemplate(payload)
-      };
-
-      transporter.sendMail(message, (error: Error, info: SentMessageInfo) => {
-        if (error) throw new SendEmailFailException(error.message);
-
-        console.log('Preview URL: ' + nodemailer.getTestMessageUrl(info));
-      });
+      console.log('Message sent: ' + info.messageId);
     });
   }
 }
