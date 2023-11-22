@@ -1,15 +1,10 @@
-import { Game } from '../entity/Game';
-import { User } from '../entity/User';
+import { GameResponseDTO } from './GameResponseDTO';
 
 export class LoginResponseDTO {
-  id: number;
-  email: string;
   token: string;
-  game: Game;
+  game: GameResponseDTO;
 
-  constructor(user: User, token: string, game: Game) {
-    this.id = user.id;
-    this.email = user.email;
+  constructor(token: string, game: GameResponseDTO) {
     this.token = token;
     this.game = game;
   }
