@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { GameReview } from './GameReview';
 import { User } from './User';
 
 @Entity()
@@ -26,4 +27,7 @@ export class Game {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => GameReview, gameReview => gameReview.game)
+  gameReviews: GameReview[];
 }
