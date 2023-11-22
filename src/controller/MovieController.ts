@@ -30,7 +30,7 @@ export class MovieController {
    *               title:
    *                 type: string
    *             example:
-   *               title: Harry Potter
+   *               title: 'Harry Potter'
    *     responses:
    *       '200':
    *         description: Returns a array of movies found in the database.
@@ -45,23 +45,25 @@ export class MovieController {
    *                   type: string
    *                 data:
    *                   type: array
-   *                   properties:
-   *                     title:
-   *                       type: string
-   *                     posterPath:
-   *                       type: string
-   *                     releaseDate:
-   *                       type: date
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         title:
+   *                           type: string
+   *                         posterPath:
+   *                           type: string
+   *                         releaseDate:
+   *                           type: string
    *               example:
    *                 success: true
-   *                 message: 'Found film successfully'
-   *                 data: [
-   *                    {
-   *                   "title": 'Harry Potter and the Chamber of Secrets',
-   *                   "posterPath": /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg,
-   *                   "releaseDate": 2002-11-13
-   *                  }
-   *              ]
+   *                 message: 'Found movies successfully.'
+   *                 data:
+   *                   - title: 'Harry Potter and the Chamber of Secrets',
+   *                     posterPath: /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg,
+   *                     releaseDate: 2002-11-13
+   *                   - title: 'Harry Potter and the Philosopher's Stone',
+   *                     posterPath: /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg,
+   *                     releaseDate: 2001-11-13
    *       '400':
    *         description: Returns MovieNotFoundException.
    *         content:
