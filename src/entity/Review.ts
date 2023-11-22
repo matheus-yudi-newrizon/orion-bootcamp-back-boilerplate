@@ -10,5 +10,5 @@ export class Review {
   movie: Movie;
 
   @Column({ type: 'text' })
-  content: string;
+  text: string;
 }

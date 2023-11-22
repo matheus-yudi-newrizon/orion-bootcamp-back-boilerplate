@@ -7,16 +7,16 @@ export class Movie {
   id: number;
 
   @Column()
-  imdb_id: string;
+  imdbId: string;
 
   @Column()
   title: string;
 
   @Column()
-  poster_path: string;
+  posterPath: string;
 
   @Column()
-  release_date: string;
+  releaseDate: string;
 
   @OneToMany(() => Review, review => review.movie, { cascade: true, eager: true })
   reviews: Review[];
