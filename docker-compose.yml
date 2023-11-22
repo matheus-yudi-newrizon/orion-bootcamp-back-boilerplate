@@ -22,7 +22,7 @@ services:
       CLIENT_URL: http://localhost:4200
       EMAIL_SERVICE: gmail
       EMAIL_USERNAME: bellatriximdb@gmail.com
-      EMAIL_PASSWORD: srla vygc bfod dscz
+      EMAIL_PASSWORD: ttul nlfm faec svhf
     networks:
       - orion-connect
 
