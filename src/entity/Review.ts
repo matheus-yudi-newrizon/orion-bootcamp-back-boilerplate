@@ -1,19 +1,16 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { GameReview } from './GameReview';
 import { Movie } from './Movie';
 
 @Entity()
 export class Review {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn()
+  id: string;
 
   @ManyToOne(() => Movie, movie => movie.reviews)
   movie: Movie;
 
-  @Column()
-  title: string;
-
-  @Column()
+  @Column({ type: 'text' })
   text: string;
 
   @OneToMany(() => GameReview, gameReview => gameReview.review)

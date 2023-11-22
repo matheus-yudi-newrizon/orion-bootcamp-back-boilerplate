@@ -16,8 +16,8 @@ export class Movie {
   posterPath: string;
 
   @Column()
-  releaseDate: Date;
+  releaseDate: string;
 
-  @OneToMany(() => Review, review => review.movie)
+  @OneToMany(() => Review, review => review.movie, { cascade: true, eager: true })
   reviews: Review[];
 }
