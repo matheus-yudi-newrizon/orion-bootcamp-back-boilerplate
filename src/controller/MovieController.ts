@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
 import { MovieDTO } from '../dto/MovieDTO';
-import { BusinessException, RequiredFieldException } from '../exception';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { MovieService } from '../service/MovieService';
+import { BusinessException } from '../exception';
 import { InsufficientLengthException } from '../exception/InsufficientLengthException';
+import { IControllerResponse } from '../interface/IControllerResponse';
+import { ICustomRequest } from '../interface/ICustomRequest';
+import { MovieService } from '../service/MovieService';
 
 @Controller()
 export class MovieController {
@@ -12,28 +14,25 @@ export class MovieController {
 
   /**
    * @swagger
-   * /movies/title:
+   * /movies:
    *   get:
-   *     summary: get movies by title.
+   *     summary: Get movies by title.
    *     tags: [Get Movies]
    *     consumes:
    *       - application/json
    *     produces:
    *       - application/json
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               title:
-   *                 type: string
-   *             example:
-   *               title: 'Harry Potter'
+   *     security:
+   *       - bearerAuth: []
+   *     parameters:
+   *       - in: query
+   *         name: title
+   *         schema:
+   *           type: string
+   *           description: The title of the movie to query
    *     responses:
    *       '200':
-   *         description: Returns a array of movies found in the database.
+   *         description: Returns an array of movies found in the database.
    *         content:
    *           application/json:
    *             schema:
@@ -45,27 +44,27 @@ export class MovieController {
    *                   type: string
    *                 data:
    *                   type: array
-   *                     items:
-   *                       type: object
-   *                       properties:
-   *                         title:
-   *                           type: string
-   *                         posterPath:
-   *                           type: string
-   *                         releaseDate:
-   *                           type: string
+   *                   items:
+   *                     type: object
+   *                     properties:
+   *                       title:
+   *                         type: string
+   *                       posterPath:
+   *                         type: string
+   *                       releaseDate:
+   *                         type: string
    *               example:
    *                 success: true
    *                 message: 'Found movies successfully.'
    *                 data:
-   *                   - title: 'Harry Potter and the Chamber of Secrets',
-   *                     posterPath: /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg,
-   *                     releaseDate: 2002-11-13
-   *                   - title: 'Harry Potter and the Philosopher's Stone',
-   *                     posterPath: /sdEOH0992YZ0QSxgXNIGLq1ToUi.jpg,
-   *                     releaseDate: 2001-11-13
+   *                   - title: 'Pirates of the Caribbean: The Curse of the Black Pearl'
+   *                     posterPath: '/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg'
+   *                     releaseDate: '2003-07-09'
+   *                   - title: 'Pirates of the Caribbean: Dead Men Tell No Tales'
+   *                     posterPath: '/qwoGfcg6YUS55nUweKGujHE54Wy.jpg'
+   *                     releaseDate: '2017-05-23'
    *       '400':
-   *         description: Returns MovieNotFoundException.
+   *         description: Returns EntityNotFoundException.
    *         content:
    *           application/json:
    *             schema:
@@ -77,19 +76,19 @@ export class MovieController {
    *                   type: string
    *               example:
    *                 success: false
-   *                 message: 'MovieNotFoundException. Movie not found.'
+   *                 message: 'EntityNotFoundException. The movie was not found in database.'
    */
   public async searchMovies(req: Request, res: Response): Promise<void> {
     try {
-      const { title } = req.body;
+      const jwtPayload: JwtPayload = (req as ICustomRequest).token;
+      const title: string = req.query['title'] as string;
 
-      if (!title) throw new RequiredFieldException('title');
       if (title.length < 4) throw new InsufficientLengthException('title', 4);
 
-      const movies: MovieDTO[] = await this.movieService.searchMoviesByTitle(title);
+      const movies: MovieDTO[] = await this.movieService.searchMoviesByTitle(jwtPayload.id, title);
       const result: IControllerResponse<MovieDTO[]> = {
         success: true,
-        message: 'Found film successfully',
+        message: 'Found movies successfully.',
         data: movies
       };
 
