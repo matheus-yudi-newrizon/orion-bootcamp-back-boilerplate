@@ -19,6 +19,7 @@ router.post('/auth/reset-password', (req, res) => authController.resetPassword(r
 router.post('/auth/forgot-password', (req, res) => authController.forgotPassword(req, res));
 
 router.post('/games/new', validateJwt, (req, res) => gameController.newGame(req, res));
+router.put('/games/answer', validateJwt, (req, res) => gameController.sendAnswer(req, res));
 
 router.get('/reviews/random', validateJwt, (req, res) => reviewController.getReview(req, res));
 

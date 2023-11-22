@@ -1,5 +1,5 @@
 import { Service as Repository } from 'typedi';
-import { Repository as TypeOrmRepository } from 'typeorm';
+import { DeepPartial, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Game } from '../entity/Game';
 import { GameReview } from '../entity/GameReview';
@@ -25,6 +25,40 @@ export class GameReviewRepository {
         .leftJoinAndSelect('gameReview.review', 'review')
         .where('gameReview.gameId = :id', { id: game.id })
         .getMany();
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Saves a given game review in the database.
+   * If game review does not exist in the database then inserts, otherwise updates.
+   *
+   * @param gameReview - The GameReview entity to be saved or updated.
+   *
+   * @returns A promise that resolves with the saved or updated game review.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
+  public async save(gameReview: GameReview): Promise<GameReview> {
+    try {
+      return await this.ormRepository.save(gameReview);
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Creates a new game review instance and copies all game review properties from this object into a new one.
+   * Note that it copies only properties that are present in GameReview schema.
+   *
+   * @param entityLike - An object containing properties to be copied into a new GameReview instance.
+   *
+   * @returns A new GameReview instance with copied properties.
+   * @throws {DatabaseOperationFailException} If the operation fails.
+   */
+  public create(entityLike: DeepPartial<GameReview>): GameReview {
+    try {
+      return this.ormRepository.create(entityLike);
     } catch (error) {
       throw new DatabaseOperationFailException();
     }
