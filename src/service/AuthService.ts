@@ -13,6 +13,7 @@ import { UserRepository } from '../repository/UserRepository';
 import { JwtService } from '../security/JwtService';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
 import { EmailService } from '../utils/EmailService';
+import { GameResponseDTO } from '../dto/GameResponseDTO';
 
 @Service()
 export class AuthService {
@@ -40,11 +41,12 @@ export class AuthService {
     if (!validPassword) throw new AuthenticationFailedException();
 
     const activeGame: Game = await this.gameRepository.getActiveGameByUser(user);
+    const gameDTO: GameResponseDTO = activeGame ? new GameResponseDTO(activeGame) : null;
 
     const expiresIn = rememberMe ? undefined : '5h';
     const token = JwtService.generateToken({ id: user.id, email: user.email }, expiresIn);
 
-    return new LoginResponseDTO(user, token, activeGame);
+    return new LoginResponseDTO(token, gameDTO);
   }
 
   /**

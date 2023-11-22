@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import { GameReviewResponseDTO } from '../dto/GameReviewResponseDTO';
 import { GameResponseDTO } from '../dto/GameResponseDTO';
 import { Game } from '../entity/Game';
 import { GameReview } from '../entity/GameReview';
@@ -54,7 +55,7 @@ export class GameService {
    * @throws {EntityNotFoundException} if the user, game or review was not found in database.
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
-  public async sendAnswer(gameAnswerRequest: IGameAnswerRequest, userId: number): Promise<GameResponseDTO> {
+  public async sendAnswer(gameAnswerRequest: IGameAnswerRequest, userId: number): Promise<GameReviewResponseDTO> {
     const user: User = await this.userRepository.getById(userId);
     if (!user) throw new EntityNotFoundException('user');
 
@@ -92,6 +93,6 @@ export class GameService {
     await this.gameRepository.update(game.id, game);
     await this.userRepository.update(user.id, user);
 
-    return new GameResponseDTO(game);
+    return new GameReviewResponseDTO(gameReview, new GameResponseDTO(game));
   }
 }
