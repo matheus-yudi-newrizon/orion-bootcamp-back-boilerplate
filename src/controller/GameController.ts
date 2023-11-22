@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
 import { GameResponseDTO } from '../dto/GameResponseDTO';
+import { GameReviewResponseDTO } from '../dto/GameReviewResponseDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { ICustomRequest } from '../interface/ICustomRequest';
@@ -121,11 +122,11 @@ export class GameController {
    *               answer:
    *                 type: string
    *             example:
-   *               reviewId: 11
+   *               reviewId: 5059abee19c29521fe001045
    *               answer: 'Harry Potter and the Magic Wizard'
    *     responses:
    *       '201':
-   *         description: Sends the game data if the answer was computed.
+   *         description: Sends the result of the answer and also the game data.
    *         content:
    *           application/json:
    *             schema:
@@ -138,22 +139,29 @@ export class GameController {
    *                 data:
    *                   type: object
    *                   properties:
-   *                     lives:
-   *                       type: integer
-   *                     score:
-   *                       type: integer
-   *                     combo:
-   *                       type: integer
-   *                     isActive:
+   *                     isCorrect:
    *                       type: boolean
+   *                     game:
+   *                       type: object
+   *                       properties:
+   *                         lives:
+   *                           type: integer
+   *                         score:
+   *                           type: integer
+   *                         combo:
+   *                           type: integer
+   *                         isActive:
+   *                           type: boolean
    *               example:
    *                 success: true
    *                 message: 'Answer computed successfully.'
    *                 data:
-   *                   lives: 2
-   *                   score: 4
-   *                   combo: 8
-   *                   isActive: true
+   *                   isCorrect: false
+   *                   game:
+   *                     lives: 2
+   *                     score: 34
+   *                     combo: 18
+   *                     isActive: true
    *       '400':
    *         description: Returns EntityNotFoundException.
    *         content:
@@ -178,11 +186,11 @@ export class GameController {
       if (!gameAnswerRequest.reviewId) throw new RequiredFieldException('reviewId');
       if (!gameAnswerRequest.answer) throw new RequiredFieldException('answer');
 
-      const gameResponse: GameResponseDTO = await this.gameService.sendAnswer(gameAnswerRequest, jwtPayload.id);
-      const result: IControllerResponse<GameResponseDTO> = {
+      const gameReviewResponse: GameReviewResponseDTO = await this.gameService.sendAnswer(gameAnswerRequest, jwtPayload.id);
+      const result: IControllerResponse<GameReviewResponseDTO> = {
         success: true,
         message: 'Answer computed successfully.',
-        data: gameResponse
+        data: gameReviewResponse
       };
 
       res.status(201).json(result);
