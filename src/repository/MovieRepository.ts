@@ -29,8 +29,6 @@ export class MovieRepository {
       throw new DatabaseOperationFailException();
     }
   }
-<<<<<<< HEAD
-=======
 
   /**
    * Finds movies by a given id.
@@ -48,5 +46,4 @@ export class MovieRepository {
       throw new DatabaseOperationFailException();
     }
   }
->>>>>>> 6d79fd84a46b2fa304c73fdd34c4546957dddbc1
 }
