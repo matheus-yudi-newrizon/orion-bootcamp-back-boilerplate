@@ -25,8 +25,7 @@ export class ReviewService {
    * @param userId - The id of the user that requested a new review.
    *
    * @returns A promise that resolves with a review.
-   * @throws {EntityNotFoundException} if the user was not found in database.
-   * @throws {GameNotFoundException} if the active game was not found in database.
+   * @throws {EntityNotFoundException} if the user or game was not found in database.
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
   public async getReview(userId: number): Promise<ReviewDTO> {
