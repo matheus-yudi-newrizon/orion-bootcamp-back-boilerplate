@@ -32,7 +32,6 @@ export class AuthService {
    * @throws {AuthenticationFailedException} if the email or password is incorrect.
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
-  // AuthService.ts
 
   public async login(userDTO: IUserPostRequest, rememberMe: boolean): Promise<LoginResponseDTO> {
     const user: User = await this.userRepository.getByEmail(userDTO.email);
