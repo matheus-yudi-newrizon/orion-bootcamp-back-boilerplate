@@ -80,14 +80,9 @@ export class AuthService {
       await this.tokenRepository.save(token);
 
       const username: string = user.email.slice(0, user.email.indexOf('@'));
-      const link: string = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}&id=${user.id}`;
+      const link: string = `${process.env.CLIENT_URL}/auth/reset-password?token=${resetToken}&id=${user.id}`;
 
-      EmailService.sendEmail(
-        user.email,
-        'Orion Bootcamp | Password Reset Request',
-        { username: username, link: link },
-        './template/ForgotPassword.handlebars'
-      );
+      EmailService.sendEmail(user.email, 'ReviewReveal: Password Reset', { username: username, link: link }, './template/ForgotPassword.hbs');
     }
   }
 
