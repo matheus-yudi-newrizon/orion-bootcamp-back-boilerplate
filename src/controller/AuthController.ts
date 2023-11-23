@@ -143,7 +143,7 @@ export class AuthController {
    *               rememberMe: true
    *     responses:
    *       '200':
-   *         description: Returns a JWT if successful login.
+   *         description: Returns a JWT if successful login and the user active game if found in database.
    *         content:
    *           application/json:
    *             schema:
@@ -158,11 +158,27 @@ export class AuthController {
    *                   properties:
    *                     token:
    *                       type: string
+   *                     game:
+   *                       type: object
+   *                       properties:
+   *                         lives:
+   *                           type: integer
+   *                         score:
+   *                           type: integer
+   *                         combo:
+   *                           type: integer
+   *                         isActive:
+   *                           type: boolean
    *               example:
    *                 success: true
    *                 message: 'Successful login.'
    *                 data:
-   *                   token: 'ajvn234897!#$JAKSPL(*)&'
+   *                   token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
+   *                   game:
+   *                     lives: 3
+   *                     score: 40
+   *                     combo: 9
+   *                     isActive: true
    *       '400':
    *         description: Returns RequiredFieldException.
    *         content:

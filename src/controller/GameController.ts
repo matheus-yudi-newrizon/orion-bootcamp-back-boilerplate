@@ -25,7 +25,7 @@ export class GameController {
    *     security:
    *       - bearerAuth: []
    *     responses:
-   *       '200':
+   *       '201':
    *         description: Returns a new game created in the database.
    *         content:
    *           application/json:
@@ -39,8 +39,6 @@ export class GameController {
    *                 data:
    *                   type: object
    *                   properties:
-   *                     id:
-   *                       type: integer
    *                     lives:
    *                       type: integer
    *                     score:
@@ -53,8 +51,7 @@ export class GameController {
    *                 success: true
    *                 message: 'Game created successfully.'
    *                 data:
-   *                   id: 1
-   *                   lives: 5
+   *                   lives: 2
    *                   score: 0
    *                   combo: 0
    *                   isActive: true
@@ -122,8 +119,8 @@ export class GameController {
    *               answer:
    *                 type: string
    *             example:
-   *               reviewId: 5059abee19c29521fe001045
-   *               answer: 'Harry Potter and the Magic Wizard'
+   *               reviewId: 5424a49ec3a3681eca002c23
+   *               answer: 'Pirates of the Caribbean: The Curse of the Black Pearl'
    *     responses:
    *       '201':
    *         description: Sends the result of the answer and also the game data.
@@ -156,7 +153,7 @@ export class GameController {
    *                 success: true
    *                 message: 'Answer computed successfully.'
    *                 data:
-   *                   isCorrect: false
+   *                   isCorrect: true
    *                   game:
    *                     lives: 2
    *                     score: 34
