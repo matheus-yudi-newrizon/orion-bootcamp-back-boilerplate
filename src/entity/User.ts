@@ -19,9 +19,6 @@ export class User {
   playCount: number;
 
   @Column({ default: 0 })
-  login: number;
-
-  @Column({ default: 0 })
   record: number;
 
   @CreateDateColumn()
