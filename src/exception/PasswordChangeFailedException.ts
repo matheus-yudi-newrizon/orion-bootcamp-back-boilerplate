@@ -9,7 +9,7 @@ export class PasswordChangeFailedException extends BusinessException {
    *
    */
   constructor() {
-    super(`Password change failed.`);
+    super('Password change failed.');
     this.status = 400;
     this.name = 'PasswordChangeFailedException';
   }
