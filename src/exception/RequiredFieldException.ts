@@ -10,7 +10,7 @@ export class RequiredFieldException extends BusinessException {
    * @param field The name of the required field that was not provided.
    */
   constructor(field: string) {
-    super(`Required field: ${field}`);
+    super(`Required field: ${field}.`);
     this.status = 400;
     this.name = 'RequiredFieldException';
   }

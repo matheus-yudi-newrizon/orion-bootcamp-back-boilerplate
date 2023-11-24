@@ -16,12 +16,9 @@ export class MovieController {
    * @swagger
    * /movies:
    *   get:
-   *     summary: Get movies by title.
-   *     tags: [Get Movies]
-   *     consumes:
-   *       - application/json
-   *     produces:
-   *       - application/json
+   *     tags:
+   *       - movies
+   *     summary: Get movies by title
    *     security:
    *       - bearerAuth: []
    *     parameters:
@@ -32,51 +29,54 @@ export class MovieController {
    *           description: The title of the movie to query
    *     responses:
    *       '200':
-   *         description: Returns an array of movies found in the database.
+   *         description: Return an array of movies found in the database
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 message:
-   *                   type: string
-   *                 data:
-   *                   type: array
-   *                   items:
-   *                     type: object
-   *                     properties:
-   *                       title:
-   *                         type: string
-   *                       posterPath:
-   *                         type: string
-   *                       releaseDate:
-   *                         type: string
-   *               example:
-   *                 success: true
-   *                 message: 'Found movies successfully.'
-   *                 data:
-   *                   - title: 'Pirates of the Caribbean: The Curse of the Black Pearl'
-   *                     posterPath: '/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg'
-   *                     releaseDate: '2003-07-09'
-   *                   - title: 'Pirates of the Caribbean: Dead Men Tell No Tales'
-   *                     posterPath: '/qwoGfcg6YUS55nUweKGujHE54Wy.jpg'
-   *                     releaseDate: '2017-05-23'
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *             example:
+   *               success: true
+   *               message: 'Found movies successfully.'
+   *               data:
+   *                 - title: 'Pirates of the Caribbean: The Curse of the Black Pearl'
+   *                   posterPath: '/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg'
+   *                   releaseDate: '2003-07-09'
+   *                 - title: 'Pirates of the Caribbean: Dead Men Tell No Tales'
+   *                   posterPath: '/qwoGfcg6YUS55nUweKGujHE54Wy.jpg'
+   *                   releaseDate: '2017-05-23'
    *       '400':
-   *         description: Returns EntityNotFoundException.
+   *         description: Return a custom exception
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 message:
-   *                   type: string
-   *               example:
-   *                 success: false
-   *                 message: 'EntityNotFoundException. The movie was not found in database.'
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             examples:
+   *               InvalidQueryException:
+   *                 value:
+   *                   success: false
+   *                   message: 'InvalidQueryException. The query string is missing query parameters.'
+   *               EntityNotFoundException:
+   *                 value:
+   *                   success: false
+   *                   message: 'EntityNotFoundException. The user was not found in database.'
+   *       '401':
+   *         description: Return a JWT error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'JsonWebTokenError. invalid token.'
+   *       '500':
+   *         description: Return a database exception or error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
    */
   public async searchMovies(req: Request, res: Response): Promise<void> {
     try {

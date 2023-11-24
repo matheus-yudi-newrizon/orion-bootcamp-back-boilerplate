@@ -16,53 +16,57 @@ export class ReviewController {
    * @swagger
    * /reviews/random:
    *   get:
-   *     summary: Gets a random review.
-   *     tags: [Random review]
-   *     produces:
-   *       - application/json
+   *     tags:
+   *       - reviews
+   *     summary: Get a random review
    *     security:
    *       - bearerAuth: []
    *     responses:
    *       '200':
-   *         description: Returns a random review for the game.
+   *         description: Return a random review not loaded before in the game
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 message:
-   *                   type: string
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     id:
-   *                       type: integer
-   *                     title:
-   *                       type: string
-   *                     text:
-   *                       type: string
-   *               example:
-   *                 success: true
-   *                 message: 'Review generated successfully.'
-   *                 data:
-   *                   id: 5d38ee43b1f68d0012c2abea
-   *                   text: "Ahh, the magic begins.\r\n\r\nHarry Potter is an Orphan who on his eleventh birthday discovers he's a wizard and is called to term at Hogwarts School. But Harry is soon to find out that his past, and his destiny, is a truly remarkable, magical, and terrifying thing.\r\n\r\nHarry Potter And The Philosopher's Stone arrived in a blaze of publicity, one of the most hyped and talked about motion pictures of the decade had finally arrived."
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *             example:
+   *               success: true
+   *               message: 'Review generated successfully.'
+   *               data:
+   *                 id: 5d38ee43b1f68d0012c2abea
+   *                 text: "Ahh, the magic begins.\r\n\r\nHarry Potter is an Orphan who on his eleventh birthday discovers he's a wizard and is called to term at Hogwarts School. But Harry is soon to find out that his past, and his destiny, is a truly remarkable, magical, and terrifying thing.\r\n\r\nHarry Potter And The Philosopher's Stone arrived in a blaze of publicity, one of the most hyped and talked about motion pictures of the decade had finally arrived."
    *       '400':
-   *         description: Returns EntityNotFoundException.
+   *         description: Return a custom exception
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 message:
-   *                   type: string
-   *               example:
-   *                 success: false
-   *                 message: 'EntityNotFoundException. The user was not found in database.'
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             examples:
+   *               EmailNotValidException:
+   *                 value:
+   *                   success: false
+   *                   message: 'EmailNotValidException. The email is not a valid email address.'
+   *               EntityNotFoundException:
+   *                 value:
+   *                   success: false
+   *                   message: 'EntityNotFoundException. The user was not found in database.'
+   *       '401':
+   *         description: Return a JWT error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'JsonWebTokenError. invalid token.'
+   *       '500':
+   *         description: Return a database exception or error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
    */
   public async getReview(req: Request, res: Response): Promise<void> {
     try {
