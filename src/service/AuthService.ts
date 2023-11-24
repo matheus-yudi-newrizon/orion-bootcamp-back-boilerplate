@@ -40,7 +40,7 @@ export class AuthService {
     const validPassword = await PasswordEncrypt.compare(userDTO.password, user.password);
     if (!validPassword) throw new AuthenticationFailedException();
 
-    user.loginCount = (user.loginCount || 0) + 1;
+    user.loginCount += 1;
     await this.userRepository.save(user);
 
     const activeGame: Game = await this.gameRepository.getActiveGameByUser(user);

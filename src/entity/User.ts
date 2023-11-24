@@ -16,7 +16,7 @@ export class User {
   loginCount: number;
 
   @Column({ default: 0 })
-  gameCount: number;
+  playCount: number;
 
   @Column({ default: 0 })
   login: number;
