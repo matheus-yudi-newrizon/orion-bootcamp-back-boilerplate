@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Game } from './Game';
 
 @Entity()
 export class User {
@@ -11,6 +12,12 @@ export class User {
   @Column({ length: 100 })
   password: string;
 
+  @Column({ default: 0 })
+  login: number;
+
+  @Column({ default: 0 })
+  record: number;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -19,4 +26,7 @@ export class User {
 
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Game, game => game.user)
+  games?: Game[];
 }
