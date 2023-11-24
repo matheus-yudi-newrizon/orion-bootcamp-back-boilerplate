@@ -13,7 +13,10 @@ export class User {
   password: string;
 
   @Column({ default: 0 })
-  login: number;
+  loginCount: number;
+
+  @Column({ default: 0 })
+  playCount: number;
 
   @Column({ default: 0 })
   record: number;

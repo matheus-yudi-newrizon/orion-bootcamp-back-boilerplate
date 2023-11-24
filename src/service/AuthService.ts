@@ -33,12 +33,15 @@ export class AuthService {
    * @throws {AuthenticationFailedException} if the email or password is incorrect.
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
+
   public async login(userDTO: IUserPostRequest, rememberMe: boolean): Promise<LoginResponseDTO> {
     const user: User = await this.userRepository.getByEmail(userDTO.email);
     if (!user) throw new AuthenticationFailedException();
 
     const validPassword = await PasswordEncrypt.compare(userDTO.password, user.password);
     if (!validPassword) throw new AuthenticationFailedException();
+
+    await this.userRepository.update(user.id, { loginCount: ++user.loginCount });
 
     const activeGame: Game = await this.gameRepository.getActiveGameByUser(user);
     const gameDTO: GameResponseDTO = activeGame ? new GameResponseDTO(activeGame) : null;

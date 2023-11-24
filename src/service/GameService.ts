@@ -39,6 +39,8 @@ export class GameService {
     const gameByUser: Game = await this.gameRepository.getActiveGameByUser(user);
     if (gameByUser) throw new GameIsActiveException();
 
+    await this.userRepository.update(user.id, { playCount: ++user.playCount });
+
     const game: Game = this.gameRepository.create({ user: user, lives: 2, score: 0, combo: 0, isActive: true });
     await this.gameRepository.save(game);
 
