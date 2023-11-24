@@ -13,6 +13,12 @@ export class User {
   password: string;
 
   @Column({ default: 0 })
+  loginCount: number;
+
+  @Column({ default: 0 })
+  playCount: number;
+
+  @Column({ default: 0 })
   login: number;
 
   @Column({ default: 0 })
