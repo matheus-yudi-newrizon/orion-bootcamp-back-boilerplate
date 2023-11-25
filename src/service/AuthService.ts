@@ -44,7 +44,7 @@ export class AuthService {
     await this.userRepository.update(user.id, { loginCount: ++user.loginCount });
 
     const activeGame: Game = await this.gameRepository.getActiveGameByUser(user);
-    const gameDTO: GameResponseDTO = activeGame ? new GameResponseDTO(activeGame) : null;
+    const gameDTO: GameResponseDTO = activeGame ? new GameResponseDTO(activeGame, user) : null;
 
     const expiresIn = rememberMe ? undefined : '5h';
     const token = JwtService.generateToken({ id: user.id, email: user.email }, expiresIn);

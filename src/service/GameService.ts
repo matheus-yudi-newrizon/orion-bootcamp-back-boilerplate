@@ -44,7 +44,7 @@ export class GameService {
     const game: Game = this.gameRepository.create({ user: user, lives: 2, score: 0, combo: 0, isActive: true });
     await this.gameRepository.save(game);
 
-    return new GameResponseDTO(game);
+    return new GameResponseDTO(game, user);
   }
 
   /**
@@ -95,6 +95,6 @@ export class GameService {
     await this.gameRepository.update(game.id, game);
     await this.userRepository.update(user.id, user);
 
-    return new GameReviewResponseDTO(gameReview, new GameResponseDTO(game));
+    return new GameReviewResponseDTO(gameReview, new GameResponseDTO(game, user));
   }
 }

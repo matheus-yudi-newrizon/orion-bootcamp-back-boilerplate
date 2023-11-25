@@ -35,7 +35,7 @@ export class GameController {
    *               message: 'Game created successfully.'
    *               data:
    *                 lives: 2
-   *                 score: 0
+   *                 record: 40
    *                 combo: 0
    *                 isActive: true
    *       '400':
@@ -126,7 +126,7 @@ export class GameController {
    *                 isCorrect: true
    *                 game:
    *                   lives: 2
-   *                   score: 34
+   *                   record: 34
    *                   combo: 18
    *                   isActive: true
    *       '400':
