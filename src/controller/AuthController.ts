@@ -125,7 +125,7 @@ export class AuthController {
    *                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
    *                 game:
    *                   lives: 3
-   *                   score: 40
+   *                   record: 40
    *                   combo: 9
    *                   isActive: true
    *       '400':
