@@ -77,7 +77,10 @@ export class GameService {
 
     if (gameReview.isCorrect) {
       game.combo += 1;
-      game.score += 1;
+
+      if (game.combo > game.score) {
+        game.score += 1;
+      }
 
       if (game.combo % 10 === 0 && game.lives < 5) {
         game.lives += 1;
