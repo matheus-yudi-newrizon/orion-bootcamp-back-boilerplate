@@ -20,6 +20,7 @@ export class JwtService {
    * Verifies and decodes a JWT token.
    *
    * @param token - JWT token to be verified.
+   * @param secretKey - The secret key used in the sign method.
    *
    * @returns Decoded data from the token or null if the token is invalid.
    */
