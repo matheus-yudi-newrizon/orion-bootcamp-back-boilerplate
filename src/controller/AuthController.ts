@@ -261,7 +261,7 @@ export class AuthController {
   /**
    * @swagger
    * /auth/reset-password:
-   *   post:
+   *   put:
    *     tags:
    *       - auth
    *     summary: Reset user password.
