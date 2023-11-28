@@ -27,7 +27,6 @@ export class AuthService {
    * Performs user login with the provided user data.
    *
    * @param userDTO - The user data including email and password.
-   * @param rememberMe - A flag indicating whether the session should be remembered.
    *
    * @returns A promise that resolves with the login response, including an authentication token.
    * @throws {AuthenticationFailedException} if the email or password is incorrect.
