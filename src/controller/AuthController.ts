@@ -133,26 +133,28 @@ export class AuthController {
    *               rememberMe: true
    *     responses:
    *       '200':
-   *         description: Returns a JWT if successful login.
+   *         description: >
+   *           Return a JWT refresh token in a cookie named refreshToken if rememberMe is true.
+   *           If successfully login, return the JWT access token and the user active game
+   *         headers:
+   *           Set-Cookie:
+   *             schema:
+   *               type: string
+   *               example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI5LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMTI3MzAyMSwiZXhwIjoxNzAxMzU5NDIxfQ.eEsHjdizASxt6RWslDHZMgypd7zFXN1uewtjr0S19NM; Path=/; HttpOnly; SameSite=Strict
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 message:
-   *                   type: string
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     token:
-   *                       type: string
-   *               example:
-   *                 success: true
-   *                 message: 'Successful login.'
-   *                 data:
-   *                   token: 'ajvn234897!#$JAKSPL(*)&'
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *             example:
+   *               success: true
+   *               message: 'Successful login.'
+   *               data:
+   *                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
+   *                 game:
+   *                   lives: 3
+   *                   record: 40
+   *                   combo: 9
+   *                   isActive: true
    *       '400':
    *         description: Returns RequiredFieldException.
    *         content:
@@ -300,16 +302,12 @@ export class AuthController {
    *   put:
    *     tags:
    *       - auth
-<<<<<<< HEAD
    *     summary: Reset user password.
    *     tags: [Reset password]
    *     consumes:
    *       - application/json
    *     produces:
    *       - application/json
-=======
-   *     summary: Reset user password
->>>>>>> 510da82 (feat: adição da rota refresh-token, método refreshToken e melhoria no login)
    *     requestBody:
    *       required: true
    *       content:
@@ -409,13 +407,7 @@ export class AuthController {
    *   post:
    *     tags:
    *       - auth
-   *     summary: Refresh JWT tokens: access and refresh
-   *     parameters:
-   *       - in: cookie
-   *         name: refreshToken
-   *         schema:
-   *           type: string
-   *         required: true
+   *     summary: Refresh JWT tokens
    *     responses:
    *       '201':
    *         description: Return JWT access token
