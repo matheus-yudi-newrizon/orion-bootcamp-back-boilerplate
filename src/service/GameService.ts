@@ -67,13 +67,10 @@ export class GameService {
     const review: Review = await this.reviewRepository.getById(gameAnswerRequest.reviewId);
     if (!review) throw new EntityNotFoundException('review');
 
-    const gameReview: GameReview = this.gameReviewRepository.create({
-      game: game,
-      review: review,
-      answer: gameAnswerRequest.answer,
-      isCorrect: gameAnswerRequest.answer === review.movie.title
-    });
-    await this.gameReviewRepository.save(gameReview);
+    const gameReview: GameReview = game.currentGameReview;
+    gameReview.answer = gameAnswerRequest.answer;
+    gameReview.isCorrect = gameAnswerRequest.answer === review.movie.title;
+    await this.gameReviewRepository.update(gameReview.id, gameReview);
 
     if (gameReview.isCorrect) {
       game.combo += 1;
@@ -92,6 +89,7 @@ export class GameService {
       game.isActive = game.lives > 0;
     }
 
+    game.currentGameReview = null;
     await this.gameRepository.update(game.id, game);
     await this.userRepository.update(user.id, user);
 

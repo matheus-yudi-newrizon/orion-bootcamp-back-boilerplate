@@ -30,4 +30,7 @@ export class Game {
 
   @OneToMany(() => GameReview, gameReview => gameReview.game)
   gameReviews: GameReview[];
+
+  @ManyToOne(() => GameReview, { eager: true })
+  currentGameReview: GameReview;
 }

@@ -1,4 +1,4 @@
 export interface IGameAnswerRequest {
-  reviewId: number;
+  reviewId: string;
   answer: string;
 }

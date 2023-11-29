@@ -29,19 +29,94 @@ export class ReviewService {
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
   public async getReview(userId: number): Promise<ReviewDTO> {
-    const user: User = await this.userRepository.getById(userId);
-    if (!user) throw new EntityNotFoundException('user');
+    const user: User = await this.getUserById(userId);
+    const game: Game = await this.getActiveGameByUser(user);
 
-    const game: Game = await this.gameRepository.getActiveGameByUser(user);
-    if (!game) throw new EntityNotFoundException('game');
+    if (game.currentGameReview === null) {
+      const randomReview: Review = await this.getRandomReviewValid(game);
 
-    const gameReviews: GameReview[] = await this.gameReviewRepository.getByGame(game);
-    let review: Review;
+      const gameReview: GameReview = this.createGameReview(game, randomReview);
+      await this.gameReviewRepository.save(gameReview);
 
-    do {
-      review = await this.reviewRepository.getRandomReview();
-    } while (gameReviews.some(gameReview => gameReview.review.id === review.id));
+      game.currentGameReview = gameReview;
+      await this.gameRepository.update(game.id, game);
+    }
+
+    const review: Review = await this.getReviewById(game.currentGameReview.review.id);
+    console.log('\nCurrent review tittle: ', review.movie.title);
 
     return new ReviewDTO(review);
+  }
+
+  /**
+   * Fetches a random valid review not already in the game's review list.
+   *
+   * @param game - The Game entity.
+   * @returns A Promise resolving with a Review.
+   */
+  private async getRandomReviewValid(game: Game): Promise<Review> {
+    const gameReviews: GameReview[] = await this.gameReviewRepository.getByGame(game);
+
+    let randomReview: Review;
+    do {
+      randomReview = await this.reviewRepository.getRandomReview();
+    } while (gameReviews.some(gameReview => gameReview.review.id === randomReview.id));
+
+    return randomReview;
+  }
+
+  /**
+   * Creates a new GameReview entity based on the provided Game and Review entities.
+   *
+   * @param game - The Game entity.
+   * @param randomReview - The Review entity.
+   * @returns A new GameReview entity.
+   */
+  private createGameReview(game: Game, randomReview: Review): GameReview {
+    return this.gameReviewRepository.create({
+      game: game,
+      review: randomReview,
+      answer: null,
+      isCorrect: null
+    });
+  }
+
+  /**
+   * Retrieves a User entity based on the provided user identifier.
+   *
+   * @param userId - The identifier of the user.
+   * @returns A Promise resolving with a User entity.
+   * @throws {EntityNotFoundException} if the user is not found in the database.
+   */
+  private async getUserById(userId: number): Promise<User> {
+    const user: User = await this.userRepository.getById(userId);
+    if (!user) throw new EntityNotFoundException('user');
+    return user;
+  }
+
+  /**
+   * Retrieves an active Game entity associated with the provided User entity.
+   *
+   * @param user - The User entity.
+   * @returns A Promise resolving with an active Game entity.
+   * @throws {EntityNotFoundException} if an active game is not found for the user.
+   */
+  private async getActiveGameByUser(user: User): Promise<Game> {
+    const game: Game = await this.gameRepository.getActiveGameByUser(user);
+    if (!game) throw new EntityNotFoundException('game');
+    return game;
+  }
+
+  /**
+   * Retrieves a Review entity based on the provided review identifier.
+   *
+   * @param reviewId - The identifier of the review.
+   * @returns A Promise resolving with a Review entity.
+   * @throws {EntityNotFoundException} if the review is not found in the database.
+   */
+  private async getReviewById(reviewId: string): Promise<Review> {
+    const review: Review = await this.reviewRepository.getById(reviewId);
+    if (!review) throw new EntityNotFoundException('review');
+    return review;
   }
 }
