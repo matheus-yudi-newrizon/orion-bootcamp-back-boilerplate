@@ -1,5 +1,5 @@
 import { Service as Repository } from 'typedi';
-import { DeepPartial, Repository as TypeOrmRepository } from 'typeorm';
+import { DeepPartial, Repository as TypeOrmRepository, UpdateResult } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Game } from '../entity/Game';
 import { GameReview } from '../entity/GameReview';
@@ -59,6 +59,23 @@ export class GameReviewRepository {
   public create(entityLike: DeepPartial<GameReview>): GameReview {
     try {
       return this.ormRepository.create(entityLike);
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Updates a gameReview by id with the given data.
+   *
+   * @param id - The id of the gameReview to update.
+   * @param gameReviewData - The data to update.
+   *
+   * @returns A promise that resolves with the update result.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
+  public async update(id: number, gameReviewData: DeepPartial<GameReview>): Promise<UpdateResult> {
+    try {
+      return await this.ormRepository.update(id, gameReviewData);
     } catch (error) {
       throw new DatabaseOperationFailException();
     }

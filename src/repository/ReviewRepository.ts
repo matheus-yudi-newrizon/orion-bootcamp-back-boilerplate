@@ -31,7 +31,7 @@ export class ReviewRepository {
    * @returns A promise that resolves with the review if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
-  public async getById(id: number): Promise<Review | null> {
+  public async getById(id: string): Promise<Review | null> {
     try {
       return await this.ormRepository.findOne({
         relations: { movie: true },
