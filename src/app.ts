@@ -7,6 +7,7 @@ import swaggerUI from 'swagger-ui-express';
 import { MysqlDataSource } from './config/database';
 import { swaggerConfig } from './config/swagger';
 import routes from './routes';
+import cookieParser from 'cookie-parser';
 
 MysqlDataSource.initialize()
   .then(() => {
@@ -18,6 +19,7 @@ MysqlDataSource.initialize()
 
 const app = express();
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true }));
 app.use(routes);
