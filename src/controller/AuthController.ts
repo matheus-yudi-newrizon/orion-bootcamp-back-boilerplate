@@ -115,7 +115,14 @@ export class AuthController {
    *       required: true
    *     responses:
    *       '200':
-   *         description: Returns a JWT if successful login and the user active game if found in database
+   *         description: >
+   *           Return a JWT refresh token in a cookie named refreshToken if rememberMe is true.
+   *           If successfully login, return the JWT access token and the user active game
+   *         headers:
+   *           Set-Cookie:
+   *             schema:
+   *               type: string
+   *               example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI5LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMTI3MzAyMSwiZXhwIjoxNzAxMzU5NDIxfQ.eEsHjdizASxt6RWslDHZMgypd7zFXN1uewtjr0S19NM; Path=/; HttpOnly; SameSite=Strict
    *         content:
    *           application/json:
    *             schema:
@@ -124,7 +131,7 @@ export class AuthController {
    *               success: true
    *               message: 'Successful login.'
    *               data:
-   *                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
+   *                 accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
    *                 game:
    *                   lives: 3
    *                   record: 40
@@ -350,13 +357,7 @@ export class AuthController {
    *   post:
    *     tags:
    *       - auth
-   *     summary: Refresh JWT tokens: access and refresh
-   *     parameters:
-   *       - in: cookie
-   *         name: refreshToken
-   *         schema:
-   *           type: string
-   *         required: true
+   *     summary: Refresh JWT tokens
    *     responses:
    *       '201':
    *         description: Return JWT access token
