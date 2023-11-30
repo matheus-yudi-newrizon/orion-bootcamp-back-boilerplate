@@ -13,6 +13,9 @@ export class Review {
   @Column({ type: 'text' })
   text: string;
 
+  @Column()
+  author: string;
+
   @OneToMany(() => GameReview, gameReview => gameReview.review)
   gameReviews: GameReview[];
 }

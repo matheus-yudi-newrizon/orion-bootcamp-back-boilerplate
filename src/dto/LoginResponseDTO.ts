@@ -1,11 +1,11 @@
 import { GameResponseDTO } from './GameResponseDTO';
 
 export class LoginResponseDTO {
-  token: string;
+  accessToken: string;
   game: GameResponseDTO;
 
-  constructor(token: string, game: GameResponseDTO) {
-    this.token = token;
+  constructor(accessToken: string, game: GameResponseDTO) {
+    this.accessToken = accessToken;
     this.game = game;
   }
 }

@@ -1,10 +1,12 @@
 import { LoginResponseDTO } from 'dto/LoginResponseDTO';
 import { Request, Response } from 'express';
+import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
+import { JwtService } from '../security/JwtService';
 import { AuthService } from '../service/AuthService';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
@@ -131,26 +133,28 @@ export class AuthController {
    *               rememberMe: true
    *     responses:
    *       '200':
-   *         description: Returns a JWT if successful login.
+   *         description: >
+   *           Return a JWT refresh token in a cookie named refreshToken if rememberMe is true.
+   *           If successfully login, return the JWT access token and the user active game
+   *         headers:
+   *           Set-Cookie:
+   *             schema:
+   *               type: string
+   *               example: refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTI5LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMTI3MzAyMSwiZXhwIjoxNzAxMzU5NDIxfQ.eEsHjdizASxt6RWslDHZMgypd7zFXN1uewtjr0S19NM; Path=/; HttpOnly; SameSite=Strict
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 success:
-   *                   type: boolean
-   *                 message:
-   *                   type: string
-   *                 data:
-   *                   type: object
-   *                   properties:
-   *                     token:
-   *                       type: string
-   *               example:
-   *                 success: true
-   *                 message: 'Successful login.'
-   *                 data:
-   *                   token: 'ajvn234897!#$JAKSPL(*)&'
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *             example:
+   *               success: true
+   *               message: 'Successful login.'
+   *               data:
+   *                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
+   *                 game:
+   *                   lives: 3
+   *                   record: 40
+   *                   combo: 9
+   *                   isActive: true
    *       '400':
    *         description: Returns RequiredFieldException.
    *         content:
@@ -189,7 +193,14 @@ export class AuthController {
       if (!userCredentials.password) throw new RequiredFieldException('password');
       if (rememberMe == null) throw new RequiredFieldException('rememberMe');
 
-      const loginResponse: LoginResponseDTO = await this.authService.login(userCredentials, rememberMe);
+      const loginResponse: LoginResponseDTO = await this.authService.login(userCredentials);
+      const decoded = JwtService.verifyToken(loginResponse.accessToken, process.env.ACCESS_TOKEN_SECRET) as JwtPayload;
+
+      if (rememberMe) {
+        const refreshToken = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.REFRESH_TOKEN_SECRET, '24h');
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' });
+      }
+
       const result: IControllerResponse<LoginResponseDTO> = {
         success: true,
         message: 'Successful login.',
@@ -289,12 +300,9 @@ export class AuthController {
    * @swagger
    * /auth/reset-password:
    *   post:
+   *     tags:
+   *       - auth
    *     summary: Reset user password.
-   *     tags: [Reset password]
-   *     consumes:
-   *       - application/json
-   *     produces:
-   *       - application/json
    *     requestBody:
    *       required: true
    *       content:
@@ -385,6 +393,60 @@ export class AuthController {
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
       res.status(statusCode).json(result);
+    }
+  }
+
+  /**
+   * @swagger
+   * /auth/refresh-token:
+   *   post:
+   *     tags:
+   *       - auth
+   *     summary: Refresh JWT tokens
+   *     responses:
+   *       '201':
+   *         description: Return JWT access token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *             example:
+   *               success: true
+   *               message: 'Access token generated.'
+   *               data: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
+   *       '401':
+   *         description: Return an authentication exception
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'JsonWebTokenError. No refresh token provided.'
+   */
+  public async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      let refreshToken: string = req.cookies['refreshToken'];
+      if (!refreshToken) throw new JsonWebTokenError('No refresh token provided.');
+
+      const decoded = JwtService.verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET) as JwtPayload;
+      refreshToken = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.REFRESH_TOKEN_SECRET, '24h');
+      const accessToken: string = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.ACCESS_TOKEN_SECRET, '1h');
+
+      const result: IControllerResponse<string> = {
+        success: true,
+        message: 'Access token generated.',
+        data: accessToken
+      };
+
+      res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' }).status(201).json(result);
+    } catch (error) {
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
+
+      res.status(401).json(result);
     }
   }
 }
