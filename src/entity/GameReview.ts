@@ -11,14 +11,14 @@ export class GameReview {
   @JoinColumn({ name: 'gameId' })
   game: Game;
 
-  @ManyToOne(() => Review, review => review.gameReviews)
+  @ManyToOne(() => Review, review => review.gameReviews, { eager: true })
   @JoinColumn({ name: 'reviewId' })
   review: Review;
 
-  @Column()
+  @Column({ nullable: true })
   answer: string;
 
-  @Column()
+  @Column({ nullable: true })
   isCorrect: boolean;
 
   @CreateDateColumn()
