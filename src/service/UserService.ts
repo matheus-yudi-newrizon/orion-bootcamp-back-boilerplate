@@ -27,11 +27,11 @@ export class UserService {
    * @throws {SendEmailFailException} if there is a failure sending email.
    */
   public async createUser(userDTO: IUserPostRequest): Promise<void> {
-    const userByEmail: User = await this.userRepository.getByEmail(userDTO.email);
-    if (userByEmail?.isActive) throw new OperationFailException('It was not possible to create user.');
+    let user: User = await this.userRepository.getByEmail(userDTO.email);
+    if (user?.isActive) throw new OperationFailException('It was not possible to create user.');
 
-    if (userByEmail) {
-      const oldToken: Token = await this.tokenRepository.findById(userByEmail.id);
+    if (user) {
+      const oldToken: Token = await this.tokenRepository.findById(user.id);
 
       if (oldToken) {
         const expiresIn: number = oldToken.createdAt.getTime() + 1800000;
@@ -39,18 +39,18 @@ export class UserService {
 
         if (expiresIn > currentTime) throw new OperationFailException('Check your email address.');
 
-        await this.tokenRepository.deleteById(userByEmail.id);
+        await this.tokenRepository.deleteById(user.id);
       }
     } else {
       const passwordEncrypted: string = await PasswordEncrypt.encrypt(userDTO.password);
       userDTO.password = passwordEncrypted;
+
+      user = this.userRepository.create(userDTO);
+      await this.userRepository.save(user);
     }
 
     const confirmToken: string = crypto.randomBytes(32).toString('hex');
     const hash: string = await PasswordEncrypt.encrypt(confirmToken);
-
-    const user: User = this.userRepository.create(userDTO);
-    await this.userRepository.save(user);
 
     const token: Token = this.tokenRepository.create({ user, token: hash });
     await this.tokenRepository.save(token);

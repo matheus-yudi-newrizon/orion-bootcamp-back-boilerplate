@@ -7,6 +7,7 @@ import { User } from '../entity/User';
 import { EntityNotFoundException } from '../exception/EntityNotFoundException';
 import { GameRepository } from '../repository/GameRepository';
 import { GameReviewRepository } from '../repository/GameReviewRepository';
+import { MovieRepository } from '../repository/MovieRepository';
 import { ReviewRepository } from '../repository/ReviewRepository';
 import { UserRepository } from '../repository/UserRepository';
 
@@ -16,7 +17,8 @@ export class ReviewService {
     private readonly gameRepository: GameRepository,
     private readonly userRepository: UserRepository,
     private readonly reviewRepository: ReviewRepository,
-    private readonly gameReviewRepository: GameReviewRepository
+    private readonly gameReviewRepository: GameReviewRepository,
+    private readonly movieRepository: MovieRepository
   ) {}
 
   /**
@@ -35,7 +37,7 @@ export class ReviewService {
     const game: Game = await this.gameRepository.getActiveGameByUser(user);
     if (!game) throw new EntityNotFoundException('game');
 
-    if (game.currentGameReview === null) {
+    if (!game.currentGameReview) {
       const randomReview: Review = await this.getRandomReviewValid(game);
 
       const gameReview: GameReview = this.createGameReview(game, randomReview);
@@ -45,10 +47,10 @@ export class ReviewService {
       await this.gameRepository.update(game.id, game);
     }
 
-    const review: Review = await this.getReviewById(game.currentGameReview.review.id);
-    console.log('\nCurrent review title: ', review.movie.title);
+    const movie: Movie = game.currentGameReview.review.movie;
+    console.log(`\nCurrent review title: ${movie.title} ${movie.releaseDate.getFullYear()}`);
 
-    return new ReviewDTO(review);
+    return new ReviewDTO(game.currentGameReview.review);
   }
 
   /**
@@ -77,23 +79,10 @@ export class ReviewService {
    */
   private createGameReview(game: Game, randomReview: Review): GameReview {
     return this.gameReviewRepository.create({
-      game: game,
+      game,
       review: randomReview,
       answer: null,
       isCorrect: null
     });
-  }
-
-  /**
-   * Retrieves a Review entity based on the provided review identifier.
-   *
-   * @param reviewId - The identifier of the review.
-   * @returns A Promise resolving with a Review entity.
-   * @throws {EntityNotFoundException} if the review is not found in the database.
-   */
-  private async getReviewById(reviewId: string): Promise<Review> {
-    const review: Review = await this.reviewRepository.getById(reviewId);
-    if (!review) throw new EntityNotFoundException('review');
-    return review;
   }
 }
