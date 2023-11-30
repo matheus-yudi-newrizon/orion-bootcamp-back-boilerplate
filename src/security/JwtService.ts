@@ -1,6 +1,6 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { UserResponseDTO } from '../dto/UserResponseDTO';
-import { InvalidJwtTokenException } from '../exception/InvalidJwtTokenException';
+import { UserResponseDTO } from '../dto';
+import { InvalidJwtTokenException } from '../exception';
 
 export class JwtService {
   /**

@@ -1,7 +1,7 @@
 import { Service as Repository } from 'typedi';
 import { Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
-import { Review } from '../entity/Review';
+import { Review } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
 
 @Repository()

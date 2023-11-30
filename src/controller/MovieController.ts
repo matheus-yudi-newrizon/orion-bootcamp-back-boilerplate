@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
-import { MovieDTO } from '../dto/MovieDTO';
-import { BusinessException } from '../exception';
-import { InsufficientLengthException } from '../exception/InsufficientLengthException';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { ICustomRequest } from '../interface/ICustomRequest';
-import { MovieService } from '../service/MovieService';
+import { MovieDTO } from '../dto';
+import { BusinessException, InsufficientLengthException } from '../exception';
+import { IControllerResponse, ICustomRequest } from '../interface';
+import { MovieService } from '../service';
 
 @Controller()
 export class MovieController {

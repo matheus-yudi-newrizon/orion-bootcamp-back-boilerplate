@@ -1,15 +1,8 @@
 import { Service } from 'typedi';
-import { ReviewDTO } from '../dto/ReviewDTO';
-import { Game } from '../entity/Game';
-import { GameReview } from '../entity/GameReview';
-import { Review } from '../entity/Review';
-import { User } from '../entity/User';
-import { EntityNotFoundException } from '../exception/EntityNotFoundException';
-import { GameRepository } from '../repository/GameRepository';
-import { GameReviewRepository } from '../repository/GameReviewRepository';
-import { MovieRepository } from '../repository/MovieRepository';
-import { ReviewRepository } from '../repository/ReviewRepository';
-import { UserRepository } from '../repository/UserRepository';
+import { ReviewDTO } from '../dto';
+import { Game, GameReview, Movie, Review, User } from '../entity';
+import { EntityNotFoundException } from '../exception';
+import { GameRepository, GameReviewRepository, ReviewRepository, UserRepository } from '../repository';
 
 @Service()
 export class ReviewService {
@@ -17,8 +10,7 @@ export class ReviewService {
     private readonly gameRepository: GameRepository,
     private readonly userRepository: UserRepository,
     private readonly reviewRepository: ReviewRepository,
-    private readonly gameReviewRepository: GameReviewRepository,
-    private readonly movieRepository: MovieRepository
+    private readonly gameReviewRepository: GameReviewRepository
   ) {}
 
   /**

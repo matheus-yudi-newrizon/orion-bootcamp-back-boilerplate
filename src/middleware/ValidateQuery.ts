@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { InvalidQueryException } from '../exception/InvalidQueryException';
-import { IControllerResponse } from '../interface/IControllerResponse';
+import { InvalidQueryException } from '../exception';
+import { IControllerResponse } from '../interface';
 
 /**
  * Middleware to validate if the request contains query params.

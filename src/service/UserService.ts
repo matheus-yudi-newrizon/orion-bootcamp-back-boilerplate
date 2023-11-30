@@ -1,12 +1,10 @@
 import * as crypto from 'crypto';
 import { Service } from 'typedi';
-import { Token } from '../entity/Token';
-import { User } from '../entity/User';
-import { OperationFailException } from '../exception/OperationFailException';
-import { IUserPostRequest } from '../interface/IUserPostRequest';
-import { TokenRepository } from '../repository/TokenRepository';
-import { UserRepository } from '../repository/UserRepository';
-import { PasswordEncrypt } from '../security/PasswordEncrypt';
+import { Token, User } from '../entity';
+import { OperationFailException } from '../exception';
+import { IUserPostRequest } from '../interface';
+import { TokenRepository, UserRepository } from '../repository';
+import { PasswordEncrypt } from '../security';
 import { EmailService } from '../utils/EmailService';
 
 @Service()
@@ -22,7 +20,7 @@ export class UserService {
    * @param userDTO - The user data including email and password.
    *
    * @returns A promise that resolves with the created user.
-   * @throws {UserAlreadyExistsException} if the user already exists.
+   * @throws {OperationFailException} if the operation fails.
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    * @throws {SendEmailFailException} if there is a failure sending email.
    */

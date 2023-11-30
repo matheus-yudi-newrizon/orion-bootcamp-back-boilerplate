@@ -1,7 +1,7 @@
 import { Service as Repository } from 'typedi';
 import { Like, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
-import { Movie } from '../entity/Movie';
+import { Movie } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
 
 @Repository()

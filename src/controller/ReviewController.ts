@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
-import { ReviewDTO } from '../dto/ReviewDTO';
+import { ReviewDTO } from '../dto';
 import { BusinessException } from '../exception';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { ICustomRequest } from '../interface/ICustomRequest';
-import { ReviewService } from '../service/ReviewService';
+import { IControllerResponse, ICustomRequest } from '../interface';
+import { ReviewService } from '../service';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
 @Controller()

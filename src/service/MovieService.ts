@@ -1,12 +1,8 @@
 import { Service } from 'typedi';
-import { MovieDTO } from '../dto/MovieDTO';
-import { Game } from '../entity/Game';
-import { Movie } from '../entity/Movie';
-import { User } from '../entity/User';
-import { EntityNotFoundException } from '../exception/EntityNotFoundException';
-import { GameRepository } from '../repository/GameRepository';
-import { UserRepository } from '../repository/UserRepository';
-import { MovieRepository } from './../repository/MovieRepository';
+import { MovieDTO } from '../dto';
+import { Game, Movie, User } from '../entity';
+import { EntityNotFoundException } from '../exception';
+import { GameRepository, MovieRepository, UserRepository } from '../repository';
 
 @Service()
 export class MovieService {

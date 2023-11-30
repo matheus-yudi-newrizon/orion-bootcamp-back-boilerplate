@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { ICustomRequest } from '../interface/ICustomRequest';
-import { JwtService } from '../security/JwtService';
+import { IControllerResponse, ICustomRequest } from '../interface';
+import { JwtService } from '../security';
 
 /**
  * Middleware to validate the JWT contained in requests for protected routes.

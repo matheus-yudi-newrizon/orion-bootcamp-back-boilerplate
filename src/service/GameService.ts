@@ -1,15 +1,9 @@
 import { Service } from 'typedi';
-import { GameResponseDTO } from '../dto/GameResponseDTO';
-import { GameReviewResponseDTO } from '../dto/GameReviewResponseDTO';
-import { Game } from '../entity/Game';
-import { GameReview } from '../entity/GameReview';
-import { User } from '../entity/User';
-import { EntityNotFoundException } from '../exception/EntityNotFoundException';
-import { GameIsActiveException } from '../exception/GameIsActiveException';
-import { IGameAnswerRequest } from '../interface/IGameAnswerRequest';
-import { GameRepository } from '../repository/GameRepository';
-import { GameReviewRepository } from '../repository/GameReviewRepository';
-import { UserRepository } from '../repository/UserRepository';
+import { GameResponseDTO, GameReviewResponseDTO } from '../dto';
+import { Game, GameReview, User } from '../entity';
+import { EntityNotFoundException, GameIsActiveException } from '../exception';
+import { IGameAnswerRequest } from '../interface';
+import { GameRepository, GameReviewRepository, UserRepository } from '../repository';
 
 @Service()
 export class GameService {

@@ -1,4 +1,4 @@
-import { Review } from '../entity/Review';
+import { Review } from '../entity';
 
 export class ReviewDTO {
   id: string;
