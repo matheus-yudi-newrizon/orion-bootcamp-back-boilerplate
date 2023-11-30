@@ -37,13 +37,10 @@ export class AuthController {
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponseData'
+   *               $ref: '#/components/schemas/ApiResponse'
    *             example:
    *               success: true
    *               message: 'User created successfully.'
-   *               data:
-   *                 id: 1
-   *                 email: 'orion.bootcamp@email.com'
    *       '400':
    *         description: Return a custom exception
    *         content:
@@ -55,10 +52,10 @@ export class AuthController {
    *                 value:
    *                   success: false
    *                   message: 'EmailNotValidException. The email is not a valid email address.'
-   *               UserAlreadyExistsException:
+   *               OperationFailException:
    *                 value:
    *                   success: false
-   *                   message: "UserAlreadyExistsException. The user with email 'orion.bootcamp@email.com' already exists."
+   *                   message: 'OperationFailException. Check your email address.'
    *       '500':
    *         description: Return a database exception or error
    *         content:
@@ -81,11 +78,10 @@ export class AuthController {
       UserRequestValidator.validateUserEmail(userPostRequest.email);
       UserRequestValidator.validateUserPassword(userPostRequest.password, confirmPassword);
 
-      const userResponse: UserResponseDTO = await this.userService.createUser(userPostRequest);
-      const result: IControllerResponse<UserResponseDTO> = {
+      await this.userService.createUser(userPostRequest);
+      const result: IControllerResponse<void> = {
         success: true,
-        message: 'User created successfully.',
-        data: userResponse
+        message: 'User created successfully.'
       };
 
       res.status(201).json(result);
@@ -341,7 +337,7 @@ export class AuthController {
 
       res.status(200).json(result);
     } catch (error) {
-      const result: IControllerResponse<UserResponseDTO> = {
+      const result: IControllerResponse<void> = {
         success: false,
         message: `${error.name}. ${error.message}`
       };
@@ -402,6 +398,79 @@ export class AuthController {
       };
 
       res.status(401).json(result);
+    }
+  }
+
+  /**
+   * @swagger
+   * /auth/confirm-email:
+   *   put:
+   *     tags:
+   *       - auth
+   *     summary: Confirm user email
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/ConfirmEmailRequest'
+   *       required: true
+   *     responses:
+   *       '200':
+   *         description: Return the email was confirmed successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: true
+   *               message: 'Email confirmed successfully.'
+   *       '400':
+   *         description: Return a custom exception
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             examples:
+   *               EntityNotFoundException:
+   *                 value:
+   *                   success: false
+   *                   message: 'EntityNotFoundException. The token was not found in database.'
+   *               OperationFailException:
+   *                 value:
+   *                   success: false
+   *                   message: 'OperationFailException. The token is not valid.'
+   *       '500':
+   *         description: Return a database exception or error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   */
+  public async confirmEmail(req: Request, res: Response): Promise<void> {
+    try {
+      const { id, token } = req.body;
+
+      if (!id) throw new RequiredFieldException('id');
+      if (!token) throw new RequiredFieldException('token');
+
+      await this.authService.confirmEmail(id, token);
+      const result: IControllerResponse<void> = {
+        success: true,
+        message: 'Email confirmed successfully.'
+      };
+
+      res.status(200).json(result);
+    } catch (error) {
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
+
+      res.status(statusCode).json(result);
     }
   }
 }
