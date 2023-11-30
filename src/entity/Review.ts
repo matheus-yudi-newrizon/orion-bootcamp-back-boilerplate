@@ -7,7 +7,7 @@ export class Review {
   @PrimaryColumn()
   id: string;
 
-  @ManyToOne(() => Movie, movie => movie.reviews)
+  @ManyToOne(() => Movie, movie => movie.reviews, { eager: true })
   movie: Movie;
 
   @Column({ type: 'text' })
