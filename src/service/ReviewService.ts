@@ -29,8 +29,11 @@ export class ReviewService {
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
    */
   public async getReview(userId: number): Promise<ReviewDTO> {
-    const user: User = await this.getUserById(userId);
-    const game: Game = await this.getActiveGameByUser(user);
+    const user: User = await this.userRepository.getById(userId);
+    if (!user) throw new EntityNotFoundException('user');
+
+    const game: Game = await this.gameRepository.getActiveGameByUser(user);
+    if (!game) throw new EntityNotFoundException('game');
 
     if (game.currentGameReview === null) {
       const randomReview: Review = await this.getRandomReviewValid(game);
@@ -79,32 +82,6 @@ export class ReviewService {
       answer: null,
       isCorrect: null
     });
-  }
-
-  /**
-   * Retrieves a User entity based on the provided user identifier.
-   *
-   * @param userId - The identifier of the user.
-   * @returns A Promise resolving with a User entity.
-   * @throws {EntityNotFoundException} if the user is not found in the database.
-   */
-  private async getUserById(userId: number): Promise<User> {
-    const user: User = await this.userRepository.getById(userId);
-    if (!user) throw new EntityNotFoundException('user');
-    return user;
-  }
-
-  /**
-   * Retrieves an active Game entity associated with the provided User entity.
-   *
-   * @param user - The User entity.
-   * @returns A Promise resolving with an active Game entity.
-   * @throws {EntityNotFoundException} if an active game is not found for the user.
-   */
-  private async getActiveGameByUser(user: User): Promise<Game> {
-    const game: Game = await this.gameRepository.getActiveGameByUser(user);
-    if (!game) throw new EntityNotFoundException('game');
-    return game;
   }
 
   /**
