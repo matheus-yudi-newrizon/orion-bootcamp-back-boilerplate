@@ -98,6 +98,19 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
             }
           }
         },
+        ConfirmEmailRequest: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'number',
+              example: 1
+            },
+            token: {
+              type: 'string',
+              example: '9537dc28fde56be7af87cb4967ca05f292ea94d551d31d0fba92cb58d8a3586d'
+            }
+          }
+        },
         ApiResponse: {
           type: 'object',
           properties: {
