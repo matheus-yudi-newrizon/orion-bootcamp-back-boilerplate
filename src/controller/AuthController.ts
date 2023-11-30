@@ -20,52 +20,58 @@ export class AuthController {
    * @swagger
    * /auth/signup:
    *   post:
-   *     tags:
-   *       - auth
-   *     summary: Create a new user in database
+   *     summary: Register a new user.
+   *     tags: [Sign up]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
    *     requestBody:
+   *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/SignUpRequest'
-   *       required: true
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *             example:
+   *               email: orion.bootcamp@email.com
+   *               password: 12345678aA!
+   *               confirmPassword: 12345678aA!
    *     responses:
    *       '201':
-   *         description: Return the user created in database
+   *         description:  Returns a message indicating successful registration.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponseData'
-   *             example:
-   *               success: true
-   *               message: 'User created successfully.'
-   *               data:
-   *                 id: 1
-   *                 email: 'orion.bootcamp@email.com'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: true
+   *                 message: 'User created successfully'
    *       '400':
-   *         description: Return a custom exception
+   *         description: Returns PasswordMismatchException.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             examples:
-   *               EmailNotValidException:
-   *                 value:
-   *                   success: false
-   *                   message: 'EmailNotValidException. The email is not a valid email address.'
-   *               UserAlreadyExistsException:
-   *                 value:
-   *                   success: false
-   *                   message: "UserAlreadyExistsException. The user with email 'orion.bootcamp@email.com' already exists."
-   *       '500':
-   *         description: Return a database exception or error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'PasswordMismatchException. The provided password does not match the confirmation password.'
    */
   public async signup(req: Request, res: Response): Promise<void> {
     try {
@@ -79,11 +85,9 @@ export class AuthController {
       UserRequestValidator.validateUserEmail(userPostRequest.email);
       UserRequestValidator.validateUserPassword(userPostRequest.password, confirmPassword);
 
-      const userResponse: UserResponseDTO = await this.userService.createUser(userPostRequest);
       const result: IControllerResponse<UserResponseDTO> = {
         success: true,
-        message: 'User created successfully.',
-        data: userResponse
+        message: 'User register successfully'
       };
 
       res.status(201).json(result);
@@ -102,59 +106,79 @@ export class AuthController {
    * @swagger
    * /auth/login:
    *   post:
-   *     tags:
-   *       - auth
-   *     summary: Login an authenticated user
+   *     summary: Login an authenticated user.
+   *     tags: [Login]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
    *     requestBody:
+   *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/LoginRequest'
-   *       required: true
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               rememberMe:
+   *                 type: boolean
+   *             example:
+   *               email: orion.bootcamp@email.com
+   *               password: 12345678aA!
+   *               rememberMe: true
    *     responses:
    *       '200':
-   *         description: Returns a JWT if successful login and the user active game if found in database
+   *         description: Returns a JWT if successful login.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponseData'
-   *             example:
-   *               success: true
-   *               message: 'Successful login.'
-   *               data:
-   *                 token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
-   *                 game:
-   *                   lives: 3
-   *                   record: 40
-   *                   combo: 9
-   *                   isActive: true
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     token:
+   *                       type: string
+   *               example:
+   *                 success: true
+   *                 message: 'Successful login.'
+   *                 data:
+   *                   token: 'ajvn234897!#$JAKSPL(*)&'
    *       '400':
-   *         description: Return a custom exception
+   *         description: Returns RequiredFieldException.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'RequiredFieldException. Required field: password.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'RequiredFieldException. Required field: password.'
    *       '401':
-   *         description: Return an authentication exception
+   *         description: Returns AuthenticationFailedException.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'AuthenticationFailedException. Authentication failed. Email or password is incorrect.'
-   *       '500':
-   *         description: Return a database exception or error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'AuthenticationFailedException. Authentication failed. Email or password is incorrect.'
    */
   public async login(req: Request, res: Response): Promise<void> {
     try {
@@ -188,49 +212,52 @@ export class AuthController {
    * @swagger
    * /auth/forgot-password:
    *   post:
-   *     tags:
-   *       - auth
-   *     summary: Request an email to recover password
+   *     summary: Request an email to recover password.
+   *     tags: [Forgot password]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
    *     requestBody:
+   *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/ForgotPasswordRequest'
-   *       required: true
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *             example:
+   *               email: orion.bootcamp@email.com
    *     responses:
    *       '200':
-   *         description: Return that a recovery email has been sent
+   *         description: Returns that a recovery email has been sent.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: true
-   *               message: 'The recovery email has been sent.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: true
+   *                 message: The recovery email has been sent.
    *       '400':
-   *         description: Return a custom exception
+   *         description: Returns RequiredFieldException.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'RequiredFieldException. Required field: email.'
-   *       '500':
-   *         description: Return a server error
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             examples:
-   *               DatabaseOperationFailException:
-   *                 value:
-   *                   success: false
-   *                   message: 'DatabaseOperationFailException. Unsuccessful database operation.'
-   *               SendEmailFailException:
-   *                 value:
-   *                   success: false
-   *                   message: 'SendEmailFailException. Unsuccessful operation.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'RequiredFieldException. Required field: email.'
    */
   public async forgotPassword(req: Request, res: Response): Promise<void> {
     try {
@@ -262,49 +289,75 @@ export class AuthController {
    * @swagger
    * /auth/reset-password:
    *   post:
-   *     tags:
-   *       - auth
    *     summary: Reset user password.
+   *     tags: [Reset password]
+   *     consumes:
+   *       - application/json
+   *     produces:
+   *       - application/json
    *     requestBody:
+   *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/ResetPasswordRequest'
-   *       required: true
+   *             type: object
+   *             properties:
+   *               id:
+   *                 type: number
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *               token:
+   *                 type: string
+   *             example:
+   *               id: 10
+   *               password: 12345678aA!
+   *               confirmPassword: 12345678aA!
+   *               token: fjasdJDASAG43871233csafje
    *     responses:
    *       '200':
-   *         description: Returns the password was changed successfully
+   *         description: Returns that the password was changed successfully.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: true
-   *               message: 'Password change successfully.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: true
+   *                 message: 'Password change successfully.'
    *       '400':
-   *         description: Return a custom exception
+   *         description: Returns PasswordChangeFailedException.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             examples:
-   *               PasswordNotValidException:
-   *                 value:
-   *                   success: false
-   *                   message: 'PasswordNotValidException. The password must contain 8 characters, one uppercase letter, and one special character.'
-   *               PasswordChangeFailedException:
-   *                 value:
-   *                   success: false
-   *                   message: 'PasswordChangeFailedException. Password change failed.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'PasswordChangeFailedException: Password change failed.'
    *       '500':
-   *         description: Return a database exception or error
+   *         description: Returns Error.
    *         content:
    *           application/json:
    *             schema:
-   *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *               example:
+   *                 success: false
+   *                 message: 'Type error: property was undefined'
    */
   public async resetPassword(req: Request, res: Response): Promise<void> {
     try {
