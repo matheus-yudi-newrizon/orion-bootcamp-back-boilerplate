@@ -9,10 +9,10 @@ import { JwtService } from '../security/JwtService';
  */
 export function validateJwt(req: Request, res: Response, next: NextFunction) {
   try {
-    const accessToken: string = req.headers['authorization'].split(' ')[1];
-    const refreshToken: string = req.cookies['refreshToken'];
+    const bearerHeader: string = req.headers['authorization'];
+    if (!bearerHeader) throw new JsonWebTokenError('Invalid token.');
 
-    if (!accessToken && !refreshToken) throw new JsonWebTokenError('No token provided.');
+    const accessToken: string = bearerHeader.split(' ')[1];
 
     const jwtPayload = JwtService.verifyToken(accessToken, process.env.ACCESS_TOKEN_SECRET);
     (req as ICustomRequest).token = jwtPayload as JwtPayload;
