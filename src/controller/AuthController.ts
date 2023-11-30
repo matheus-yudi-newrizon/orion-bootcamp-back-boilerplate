@@ -57,14 +57,20 @@ export class AuthController {
    *                   success: false
    *                   message: 'OperationFailException. Check your email address.'
    *       '500':
-   *         description: Return a database exception or error
+   *         description: Return a server error
    *         content:
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *             examples:
+   *               DatabaseOperationFailException:
+   *                 value:
+   *                   success: false
+   *                   message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *               SendEmailFailException:
+   *                 value:
+   *                   success: false
+   *                   message: 'SendEmailFailException. Unsuccessful operation.'
    */
   public async signup(req: Request, res: Response): Promise<void> {
     try {

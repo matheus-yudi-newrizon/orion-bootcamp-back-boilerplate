@@ -61,7 +61,7 @@ export class GameController {
    *               $ref: '#/components/schemas/ApiResponse'
    *             example:
    *               success: false
-   *               message: 'JsonWebTokenError. invalid token.'
+   *               message: 'JsonWebTokenError. Invalid token.'
    *       '500':
    *         description: Return a database exception or error
    *         content:
@@ -152,7 +152,7 @@ export class GameController {
    *               $ref: '#/components/schemas/ApiResponse'
    *             example:
    *               success: false
-   *               message: 'JsonWebTokenError. invalid token.'
+   *               message: 'JsonWebTokenError. Invalid token.'
    *       '500':
    *         description: Return a database exception or error
    *         content:
