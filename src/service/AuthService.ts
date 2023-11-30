@@ -6,6 +6,7 @@ import { Game } from '../entity/Game';
 import { Token } from '../entity/Token';
 import { User } from '../entity/User';
 import { AuthenticationFailedException } from '../exception/AuthenticationFailedException';
+import { EntityNotFoundException } from '../exception/EntityNotFoundException';
 import { PasswordChangeFailedException } from '../exception/PasswordChangeFailedException';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
 import { GameRepository } from '../repository/GameRepository';
@@ -14,6 +15,7 @@ import { UserRepository } from '../repository/UserRepository';
 import { JwtService } from '../security/JwtService';
 import { PasswordEncrypt } from '../security/PasswordEncrypt';
 import { EmailService } from '../utils/EmailService';
+import { OperationFailException } from '../exception/OperationFailException';
 
 @Service()
 export class AuthService {
@@ -34,7 +36,7 @@ export class AuthService {
    */
   public async login(userDTO: IUserPostRequest): Promise<LoginResponseDTO> {
     const user: User = await this.userRepository.getByEmail(userDTO.email);
-    if (!user) throw new AuthenticationFailedException();
+    if (!user || !user.isActive) throw new AuthenticationFailedException();
 
     const validPassword = await PasswordEncrypt.compare(userDTO.password, user.password);
     if (!validPassword) throw new AuthenticationFailedException();
@@ -61,7 +63,7 @@ export class AuthService {
   public async forgotPassword(email: string): Promise<void> {
     const user: User = await this.userRepository.getByEmail(email);
 
-    if (user) {
+    if (user?.isActive) {
       const oldToken: Token = await this.tokenRepository.findById(user.id);
 
       if (oldToken) {
@@ -82,7 +84,7 @@ export class AuthService {
       const username: string = user.email.slice(0, user.email.indexOf('@'));
       const link: string = `${process.env.CLIENT_URL}/auth/reset-password?token=${resetToken}&id=${user.id}`;
 
-      EmailService.sendEmail(user.email, 'ReviewReveal: Password Reset', { username: username, link: link }, './template/ForgotPassword.hbs');
+      await EmailService.sendEmail(user.email, 'ReviewReveal: Password Reset', { username, link }, './template/ForgotPassword.hbs');
     }
   }
 
@@ -94,12 +96,12 @@ export class AuthService {
    * @param token - The token received via email.
    *
    * @throws {DatabaseOperationFailException} if there is a database operation failure.
+   * @throws {EntityNotFoundException} if token was not found in database.
    * @throws {PasswordChangeFailedException} if password change fails.
    */
   public async resetPassword(id: number, newPassword: string, token: string): Promise<void> {
     const tokenById: Token = await this.tokenRepository.findById(id);
-
-    if (!tokenById) throw new PasswordChangeFailedException();
+    if (!tokenById) throw new EntityNotFoundException('token');
 
     const expiresIn = tokenById.createdAt.getTime() + 1800000;
     const currentTime: number = new Date().getTime();
@@ -112,6 +114,32 @@ export class AuthService {
     const newPasswordEncrypted: string = await PasswordEncrypt.encrypt(newPassword);
 
     await this.userRepository.update(id, { password: newPasswordEncrypted });
+    await this.tokenRepository.deleteById(id);
+  }
+
+  /**
+   * Confirm the user's email with a valid token.
+   *
+   * @param id - The id of the user confirming the email.
+   * @param token - The token received via email.
+   *
+   * @throws {DatabaseOperationFailException} if there is a database operation failure.
+   * @throws {EntityNotFoundException} if token was not found in database.
+   * @throws {OperationFailException} if confirm email fails.
+   */
+  public async confirmEmail(id: number, token: string): Promise<void> {
+    const tokenById: Token = await this.tokenRepository.findById(id);
+    if (!tokenById) throw new EntityNotFoundException('token');
+
+    const expiresIn = tokenById.createdAt.getTime() + 1800000;
+    const currentTime: number = new Date().getTime();
+
+    const tokenValid = currentTime < expiresIn;
+    const tokenMatch = await PasswordEncrypt.compare(token, tokenById.token);
+
+    if (!tokenMatch || !tokenValid) throw new OperationFailException('The token is not valid.');
+
+    await this.userRepository.update(id, { isActive: true });
     await this.tokenRepository.deleteById(id);
   }
 }
