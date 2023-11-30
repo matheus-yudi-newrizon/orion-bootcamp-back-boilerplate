@@ -46,7 +46,7 @@ export class ReviewService {
     }
 
     const review: Review = await this.getReviewById(game.currentGameReview.review.id);
-    console.log('\nCurrent review tittle: ', review.movie.title);
+    console.log('\nCurrent review title: ', review.movie.title);
 
     return new ReviewDTO(review);
   }
