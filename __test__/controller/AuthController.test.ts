@@ -43,7 +43,7 @@ describe('AuthController', () => {
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
       expect(spyCreateUser).toHaveBeenCalledWith(generate.userPostRequest());
       expect(response.statusCode).toBe(201);
-      expect(response.body).toEqual({ success: true, message: 'User created successful.' });
+      expect(response.body).toEqual({ success: true, message: 'User created successfully.' });
     });
 
     it('should return 400 and RequiredFieldException for email', async () => {
