@@ -1,5 +1,4 @@
-import { Game } from '../entity/Game';
-import { User } from '../entity/User';
+import { Game, User } from '../entity';
 
 export class GameResponseDTO {
   lives: number;

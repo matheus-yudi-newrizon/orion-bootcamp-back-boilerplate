@@ -1,7 +1,7 @@
 import { Service as Repository } from 'typedi';
 import { DeepPartial, Repository as TypeOrmRepository, UpdateResult } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
-import { User } from '../entity/User';
+import { User } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
 
 @Repository()

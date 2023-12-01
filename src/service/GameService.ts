@@ -1,24 +1,15 @@
 import { Service } from 'typedi';
-import { GameReviewResponseDTO } from '../dto/GameReviewResponseDTO';
-import { GameResponseDTO } from '../dto/GameResponseDTO';
-import { Game } from '../entity/Game';
-import { GameReview } from '../entity/GameReview';
-import { Review } from '../entity/Review';
-import { User } from '../entity/User';
-import { EntityNotFoundException } from '../exception/EntityNotFoundException';
-import { GameIsActiveException } from '../exception/GameIsActiveException';
-import { IGameAnswerRequest } from '../interface/IGameAnswerRequest';
-import { GameRepository } from '../repository/GameRepository';
-import { GameReviewRepository } from '../repository/GameReviewRepository';
-import { ReviewRepository } from '../repository/ReviewRepository';
-import { UserRepository } from '../repository/UserRepository';
+import { GameResponseDTO, GameReviewResponseDTO } from '../dto';
+import { Game, GameReview, User } from '../entity';
+import { EntityNotFoundException, GameIsActiveException } from '../exception';
+import { IGameAnswerRequest } from '../interface';
+import { GameRepository, GameReviewRepository, UserRepository } from '../repository';
 
 @Service()
 export class GameService {
   constructor(
     private readonly gameRepository: GameRepository,
     private readonly userRepository: UserRepository,
-    private readonly reviewRepository: ReviewRepository,
     private readonly gameReviewRepository: GameReviewRepository
   ) {}
 
@@ -64,19 +55,18 @@ export class GameService {
     const game: Game = await this.gameRepository.getActiveGameByUser(user);
     if (!game) throw new EntityNotFoundException('game');
 
-    const review: Review = await this.reviewRepository.getById(gameAnswerRequest.reviewId);
-    if (!review) throw new EntityNotFoundException('review');
-
     const gameReview: GameReview = game.currentGameReview;
+    if (!gameReview) throw new EntityNotFoundException('game review');
+
     gameReview.answer = gameAnswerRequest.answer;
-    gameReview.isCorrect = gameAnswerRequest.answer === review.movie.title;
+    gameReview.isCorrect = gameReview.answer === gameReview.review.movie.id;
     await this.gameReviewRepository.update(gameReview.id, gameReview);
 
     if (gameReview.isCorrect) {
       game.combo += 1;
       game.score += 1;
 
-      if (game.combo % 10 === 0 && game.lives < 5) {
+      if (game.combo % 3 === 0 && game.lives < 5) {
         game.lives += 1;
       }
 

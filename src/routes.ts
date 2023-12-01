@@ -1,11 +1,7 @@
 import { Router } from 'express';
 import { Container } from 'typedi';
-import { AuthController } from './controller/AuthController';
-import { GameController } from './controller/GameController';
-import { MovieController } from './controller/MovieController';
-import { ReviewController } from './controller/ReviewController';
-import { validateJwt } from './middleware/ValidateJwt';
-import { validateQuery } from './middleware/ValidateQuery';
+import { AuthController, GameController, MovieController, ReviewController } from './controller';
+import { validateJwt, validateQuery } from './middleware';
 
 const router = Router();
 

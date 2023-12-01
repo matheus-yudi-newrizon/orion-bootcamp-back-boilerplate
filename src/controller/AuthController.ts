@@ -1,14 +1,11 @@
-import { LoginResponseDTO } from 'dto/LoginResponseDTO';
 import { Request, Response } from 'express';
 import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
-import { UserResponseDTO } from '../dto/UserResponseDTO';
+import { LoginResponseDTO, UserResponseDTO } from '../dto';
 import { BusinessException, RequiredFieldException } from '../exception';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { IUserPostRequest } from '../interface/IUserPostRequest';
-import { JwtService } from '../security/JwtService';
-import { AuthService } from '../service/AuthService';
-import { UserService } from '../service/UserService';
+import { IControllerResponse, IUserPostRequest } from '../interface';
+import { JwtService } from '../security';
+import { AuthService, UserService } from '../service';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
 @Controller()
@@ -57,14 +54,20 @@ export class AuthController {
    *                   success: false
    *                   message: 'OperationFailException. Check your email address.'
    *       '500':
-   *         description: Return a database exception or error
+   *         description: Return a server error
    *         content:
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/ApiResponse'
-   *             example:
-   *               success: false
-   *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *             examples:
+   *               DatabaseOperationFailException:
+   *                 value:
+   *                   success: false
+   *                   message: 'DatabaseOperationFailException. Unsuccessful database operation.'
+   *               SendEmailFailException:
+   *                 value:
+   *                   success: false
+   *                   message: 'SendEmailFailException. Unsuccessful operation.'
    */
   public async signup(req: Request, res: Response): Promise<void> {
     try {

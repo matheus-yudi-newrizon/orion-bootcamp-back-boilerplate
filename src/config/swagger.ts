@@ -93,8 +93,8 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
               example: '5424a49ec3a3681eca002c23'
             },
             answer: {
-              type: 'string',
-              example: 'Pirates of the Caribbean: The Curse of the Black Pearl'
+              type: 'number',
+              example: 22
             }
           }
         },
