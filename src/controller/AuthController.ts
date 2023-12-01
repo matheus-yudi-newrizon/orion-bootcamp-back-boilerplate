@@ -33,7 +33,7 @@ export class AuthController {
    *       required: true
    *     responses:
    *       '201':
-   *         description: Return the user created in database
+   *         description: Returns a message indicating successful registration.
    *         content:
    *           application/json:
    *             schema:
