@@ -30,7 +30,7 @@ const generate = new Generate();
 
 describe('AuthController', () => {
   describe('POST /auth/signup', () => {
-    it('should return 201 and the user created', async () => {
+    it('should return 201 and a success message', async () => {
       const user = generate.signUpInput();
 
       const spyValidateUserEmail = jest.spyOn(UserRequestValidator, 'validateUserEmail').mockReturnValueOnce();
@@ -43,7 +43,7 @@ describe('AuthController', () => {
       expect(spyValidateUserPassword).toHaveBeenCalledWith(user.password, user.confirmPassword);
       expect(spyCreateUser).toHaveBeenCalledWith(generate.userPostRequest());
       expect(response.statusCode).toBe(201);
-      expect(response.body).toEqual({ success: true, message: 'User created successfully', data: generate.userPayload() });
+      expect(response.body).toEqual({ success: true, message: 'User created successfully.' });
     });
 
     it('should return 400 and RequiredFieldException for email', async () => {
