@@ -20,6 +20,7 @@ router.post('/auth/signup', (req, res) => authController.signup(req, res));
 router.post('/auth/login', (req, res) => authController.login(req, res));
 router.put('/auth/reset-password', (req, res) => authController.resetPassword(req, res));
 router.post('/auth/forgot-password', (req, res) => authController.forgotPassword(req, res));
+router.post('/auth/refresh-token', (req, res) => authController.refreshToken(req, res));
 
 router.get('/movies', validateQuery(['title']), validateJwt, (req, res) => movieController.searchMovies(req, res));
 

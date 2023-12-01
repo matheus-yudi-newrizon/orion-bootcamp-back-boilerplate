@@ -1,10 +1,12 @@
 import { LoginResponseDTO } from 'dto/LoginResponseDTO';
 import { Request, Response } from 'express';
+import { JsonWebTokenError, JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
 import { UserResponseDTO } from '../dto/UserResponseDTO';
 import { BusinessException, RequiredFieldException } from '../exception';
 import { IControllerResponse } from '../interface/IControllerResponse';
 import { IUserPostRequest } from '../interface/IUserPostRequest';
+import { JwtService } from '../security/JwtService';
 import { AuthService } from '../service/AuthService';
 import { UserService } from '../service/UserService';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
@@ -189,7 +191,14 @@ export class AuthController {
       if (!userCredentials.password) throw new RequiredFieldException('password');
       if (rememberMe == null) throw new RequiredFieldException('rememberMe');
 
-      const loginResponse: LoginResponseDTO = await this.authService.login(userCredentials, rememberMe);
+      const loginResponse: LoginResponseDTO = await this.authService.login(userCredentials);
+      const decoded = JwtService.verifyToken(loginResponse.accessToken, process.env.ACCESS_TOKEN_SECRET) as JwtPayload;
+
+      if (rememberMe) {
+        const refreshToken = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.REFRESH_TOKEN_SECRET, '24h');
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' });
+      }
+
       const result: IControllerResponse<LoginResponseDTO> = {
         success: true,
         message: 'Successful login.',
@@ -291,12 +300,16 @@ export class AuthController {
    *   put:
    *     tags:
    *       - auth
+<<<<<<< HEAD
    *     summary: Reset user password.
    *     tags: [Reset password]
    *     consumes:
    *       - application/json
    *     produces:
    *       - application/json
+=======
+   *     summary: Reset user password
+>>>>>>> 510da82 (feat: adição da rota refresh-token, método refreshToken e melhoria no login)
    *     requestBody:
    *       required: true
    *       content:
@@ -387,6 +400,66 @@ export class AuthController {
       const statusCode: number = error instanceof BusinessException ? error.status : 500;
 
       res.status(statusCode).json(result);
+    }
+  }
+
+  /**
+   * @swagger
+   * /auth/refresh-token:
+   *   post:
+   *     tags:
+   *       - auth
+   *     summary: Refresh JWT tokens: access and refresh
+   *     parameters:
+   *       - in: cookie
+   *         name: refreshToken
+   *         schema:
+   *           type: string
+   *         required: true
+   *     responses:
+   *       '201':
+   *         description: Return JWT access token
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *             example:
+   *               success: true
+   *               message: 'Access token generated.'
+   *               data: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTE2LCJlbWFpbCI6Im9yaW9uLmJvb3RjYW1wQGVtYWlsLmNvbSIsImlhdCI6MTcwMDc1MDUyOX0.Ly8x6f0KOTiW_VmCbYa0b6ejKi4dF8dGydT4VFKj4oo'
+   *       '401':
+   *         description: Return an authentication exception
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *             example:
+   *               success: false
+   *               message: 'JsonWebTokenError. No refresh token provided.'
+   */
+  public async refreshToken(req: Request, res: Response): Promise<void> {
+    try {
+      let refreshToken: string = req.cookies['refreshToken'];
+      if (!refreshToken) throw new JsonWebTokenError('No refresh token provided.');
+
+      const decoded = JwtService.verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET) as JwtPayload;
+      refreshToken = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.REFRESH_TOKEN_SECRET, '24h');
+      const accessToken: string = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.ACCESS_TOKEN_SECRET, '1h');
+
+      const result: IControllerResponse<string> = {
+        success: true,
+        message: 'Access token generated.',
+        data: accessToken
+      };
+
+      res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' }).status(201).json(result);
+    } catch (error) {
+      const result: IControllerResponse<UserResponseDTO> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
+
+      res.status(401).json(result);
     }
   }
 }
