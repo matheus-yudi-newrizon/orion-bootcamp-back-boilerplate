@@ -41,9 +41,11 @@ export class MovieController {
    *                 - title: 'Pirates of the Caribbean: The Curse of the Black Pearl'
    *                   posterPath: '/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg'
    *                   releaseDate: '2003-07-09'
+   *                   id: 22
    *                 - title: 'Pirates of the Caribbean: Dead Men Tell No Tales'
    *                   posterPath: '/qwoGfcg6YUS55nUweKGujHE54Wy.jpg'
    *                   releaseDate: '2017-05-23'
+   *                   id: 166426
    *       '400':
    *         description: Return a custom exception
    *         content:
