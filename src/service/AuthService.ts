@@ -69,7 +69,7 @@ export class AuthService {
       const resetToken: string = crypto.randomBytes(32).toString('hex');
       const hash: string = await PasswordEncrypt.encrypt(resetToken);
 
-      const token: Token = this.tokenRepository.create({ user: user, token: hash });
+      const token: Token = this.tokenRepository.create({ user, token: hash });
       await this.tokenRepository.save(token);
 
       const username: string = user.email.slice(0, user.email.indexOf('@'));

@@ -1,8 +1,6 @@
-import { LoginResponseDTO } from '../../src/dto/LoginResponseDTO';
-import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
-import { Token } from '../../src/entity/Token';
-import { User } from '../../src/entity/User';
-import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
+import { GameResponseDTO, LoginResponseDTO, UserResponseDTO } from '../../src/dto';
+import { Game, Token, User } from '../../src/entity';
+import { IUserPostRequest } from '../../src/interface';
 
 /**
  * Class for generating mock data for tests.
@@ -26,11 +24,11 @@ export class Generate {
   /**
    * Generates a mock of login input.
    *
-   * @param rememberMe - A flag indicating whether the session should be remembered. Default is `false`.
+   * @param rememberMe - A flag indicating whether the session should be remembered. Default is `true`.
    *
    * @returns An object with the mocked data.
    */
-  public loginInput(rememberMe: boolean = false) {
+  public loginInput(rememberMe: boolean = true) {
     const { email, password } = this.userPostRequest();
     const input = { email, password, rememberMe };
 
@@ -83,17 +81,21 @@ export class Generate {
   /**
    * Generates a mock of user data.
    *
+   * @param isActive - A flag indicating whether the user is active or not. Default is `true`.
+   *
    * @returns A User with the mocked data.
    */
-  public userData(): User {
+  public userData(isActive: boolean = true): User {
     const userPostRequest: IUserPostRequest = this.userPostRequest();
 
     const user: User = {
       id: 1,
       email: userPostRequest.email,
       password: userPostRequest.password,
-      login: 0,
+      loginCount: 0,
+      playCount: 0,
       record: 0,
+      isActive,
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: new Date()
@@ -123,8 +125,8 @@ export class Generate {
 
     const token: Token = {
       id: 1,
-      user: user,
-      token: 'abcde12345GHIJK!@#$%',
+      user,
+      token: 'b55ea11ca19f9674b6a5d60d6c098c6d511e8bdf7de9571a8dfd5e6b56e7ec22',
       createdAt: new Date()
     };
 
@@ -138,7 +140,7 @@ export class Generate {
    */
   public expiredTokenData(): Token {
     const token: Token = this.tokenData();
-    token.token = 'ABCDE!@#$%ghijkl12345';
+    token.token = 'ecd2fab5db8aace30e1211a82114b6e214bb8dd302e375c857fcd99cc1d4269a';
     token.createdAt.setMinutes(token.createdAt.getMinutes() - 30);
 
     return token;
@@ -150,9 +152,10 @@ export class Generate {
    * @returns A LoginResponseDTO with the mocked data.
    */
   public loginResponse(): LoginResponseDTO {
-    const user: User = this.userData();
     const jwt: string = this.encodedJwt();
-    const loginReponse: LoginResponseDTO = new LoginResponseDTO(user, jwt);
+    const game: Game = this.newGame();
+    const user: User = this.userData();
+    const loginReponse: LoginResponseDTO = new LoginResponseDTO(jwt, new GameResponseDTO(game, user));
 
     return loginReponse;
   }
@@ -175,8 +178,31 @@ export class Generate {
    * @returns A string with the mocked data.
    */
   public hashedPassword(): string {
-    const hashed: string = 'ABCDEF!@#$%iuojk_>,abc';
+    const hashed: string = 'YkVD2BxmDUCZcJW4e9zFiOEzgSAPk63gdOnC1yt3YefrGT5yStqYG';
 
     return hashed;
+  }
+
+  /**
+   * Generates a mock of new game.
+   *
+   * @returns A Game with the mocked data.
+   */
+  public newGame(): Game {
+    const user: User = this.userData();
+    const game: Game = {
+      id: 1,
+      user,
+      lives: 2,
+      score: 0,
+      combo: 0,
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      gameReviews: [],
+      currentGameReview: null
+    };
+
+    return game;
   }
 }
