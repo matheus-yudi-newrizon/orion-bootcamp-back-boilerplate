@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { Movie } from '../entity/Movie';
+import { Movie } from '../entity';
 
 export class MoviesConsume1700611974260 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {

@@ -1,4 +1,4 @@
-import { GameReview } from '../entity/GameReview';
+import { GameReview } from '../entity';
 import { GameResponseDTO } from './GameResponseDTO';
 
 export class GameReviewResponseDTO {

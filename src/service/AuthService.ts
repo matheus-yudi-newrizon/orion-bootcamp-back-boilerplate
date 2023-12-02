@@ -1,21 +1,12 @@
 import * as crypto from 'crypto';
 import { Service } from 'typedi';
-import { GameResponseDTO } from '../dto/GameResponseDTO';
-import { LoginResponseDTO } from '../dto/LoginResponseDTO';
-import { Game } from '../entity/Game';
-import { Token } from '../entity/Token';
-import { User } from '../entity/User';
-import { AuthenticationFailedException } from '../exception/AuthenticationFailedException';
-import { EntityNotFoundException } from '../exception/EntityNotFoundException';
-import { PasswordChangeFailedException } from '../exception/PasswordChangeFailedException';
-import { IUserPostRequest } from '../interface/IUserPostRequest';
-import { GameRepository } from '../repository/GameRepository';
-import { TokenRepository } from '../repository/TokenRepository';
-import { UserRepository } from '../repository/UserRepository';
-import { JwtService } from '../security/JwtService';
-import { PasswordEncrypt } from '../security/PasswordEncrypt';
+import { GameResponseDTO, LoginResponseDTO } from '../dto';
+import { Game, Token, User } from '../entity';
+import { AuthenticationFailedException, EntityNotFoundException, OperationFailException, PasswordChangeFailedException } from '../exception';
+import { IUserPostRequest } from '../interface';
+import { GameRepository, TokenRepository, UserRepository } from '../repository';
+import { JwtService, PasswordEncrypt } from '../security';
 import { EmailService } from '../utils/EmailService';
-import { OperationFailException } from '../exception/OperationFailException';
 
 @Service()
 export class AuthService {
@@ -78,7 +69,7 @@ export class AuthService {
       const resetToken: string = crypto.randomBytes(32).toString('hex');
       const hash: string = await PasswordEncrypt.encrypt(resetToken);
 
-      const token: Token = this.tokenRepository.create({ user: user, token: hash });
+      const token: Token = this.tokenRepository.create({ user, token: hash });
       await this.tokenRepository.save(token);
 
       const username: string = user.email.slice(0, user.email.indexOf('@'));

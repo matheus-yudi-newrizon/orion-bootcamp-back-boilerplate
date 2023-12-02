@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
-import { ReviewDTO } from '../dto/ReviewDTO';
+import { ReviewDTO } from '../dto';
 import { BusinessException } from '../exception';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { ICustomRequest } from '../interface/ICustomRequest';
-import { ReviewService } from '../service/ReviewService';
+import { IControllerResponse, ICustomRequest } from '../interface';
+import { ReviewService } from '../service';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
 @Controller()
@@ -34,6 +33,7 @@ export class ReviewController {
    *               data:
    *                 id: 5d38ee43b1f68d0012c2abea
    *                 text: "Ahh, the magic begins.\r\n\r\nHarry Potter is an Orphan who on his eleventh birthday discovers he's a wizard and is called to term at Hogwarts School. But Harry is soon to find out that his past, and his destiny, is a truly remarkable, magical, and terrifying thing.\r\n\r\nHarry Potter And The Philosopher's Stone arrived in a blaze of publicity, one of the most hyped and talked about motion pictures of the decade had finally arrived."
+   *                 author: 'John Chard'
    *       '400':
    *         description: Return a custom exception
    *         content:
@@ -57,7 +57,7 @@ export class ReviewController {
    *               $ref: '#/components/schemas/ApiResponse'
    *             example:
    *               success: false
-   *               message: 'JsonWebTokenError. invalid token.'
+   *               message: 'JsonWebTokenError. Invalid token.'
    *       '500':
    *         description: Return a database exception or error
    *         content:

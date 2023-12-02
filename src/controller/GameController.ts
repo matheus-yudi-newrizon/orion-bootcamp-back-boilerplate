@@ -1,13 +1,10 @@
 import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
-import { GameResponseDTO } from '../dto/GameResponseDTO';
-import { GameReviewResponseDTO } from '../dto/GameReviewResponseDTO';
+import { GameResponseDTO, GameReviewResponseDTO } from '../dto';
 import { BusinessException, RequiredFieldException } from '../exception';
-import { IControllerResponse } from '../interface/IControllerResponse';
-import { ICustomRequest } from '../interface/ICustomRequest';
-import { IGameAnswerRequest } from '../interface/IGameAnswerRequest';
-import { GameService } from '../service/GameService';
+import { IControllerResponse, ICustomRequest, IGameAnswerRequest } from '../interface';
+import { GameService } from '../service';
 import { UserRequestValidator } from '../validation/UserRequestValidator';
 
 @Controller()
@@ -61,7 +58,7 @@ export class GameController {
    *               $ref: '#/components/schemas/ApiResponse'
    *             example:
    *               success: false
-   *               message: 'JsonWebTokenError. invalid token.'
+   *               message: 'JsonWebTokenError. Invalid token.'
    *       '500':
    *         description: Return a database exception or error
    *         content:
@@ -152,7 +149,7 @@ export class GameController {
    *               $ref: '#/components/schemas/ApiResponse'
    *             example:
    *               success: false
-   *               message: 'JsonWebTokenError. invalid token.'
+   *               message: 'JsonWebTokenError. Invalid token.'
    *       '500':
    *         description: Return a database exception or error
    *         content:

@@ -1,4 +1,4 @@
-import { Movie } from '../entity/Movie';
+import { Movie } from '../entity';
 
 export class MovieDTO {
   id: number;

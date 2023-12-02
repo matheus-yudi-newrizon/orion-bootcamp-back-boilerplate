@@ -1,81 +1,159 @@
 import { Container } from 'typedi';
 import { UpdateResult } from 'typeorm';
-import { LoginResponseDTO } from '../../src/dto/LoginResponseDTO';
-import { UserResponseDTO } from '../../src/dto/UserResponseDTO';
-import { Token } from '../../src/entity/Token';
-import { User } from '../../src/entity/User';
-import { DatabaseOperationFailException, SendEmailFailException } from '../../src/exception';
-import { AuthenticationFailedException } from '../../src/exception/AuthenticationFailedException';
-import { PasswordChangeFailedException } from '../../src/exception/PasswordChangeFailedException';
-import { IUserPostRequest } from '../../src/interface/IUserPostRequest';
-import { TokenRepository } from '../../src/repository/TokenRepository';
-import { UserRepository } from '../../src/repository/UserRepository';
-import { JwtService } from '../../src/security/JwtService';
-import { PasswordEncrypt } from '../../src/security/PasswordEncrypt';
-import { AuthService } from '../../src/service/AuthService';
+import { LoginResponseDTO } from '../../src/dto';
+import { Token, User } from '../../src/entity';
+import {
+  AuthenticationFailedException,
+  DatabaseOperationFailException,
+  EntityNotFoundException,
+  PasswordChangeFailedException,
+  SendEmailFailException
+} from '../../src/exception';
+import { IUserPostRequest } from '../../src/interface';
+import { GameRepository, TokenRepository, UserRepository } from '../../src/repository';
+import { JwtService, PasswordEncrypt } from '../../src/security';
+import { AuthService } from '../../src/service';
 import { EmailService } from '../../src/utils/EmailService';
 import { Generate } from '../mocks/Generate';
 
 const authService = Container.get(AuthService);
 const userRepository = Container.get(UserRepository);
+const gameRepository = Container.get(GameRepository);
 const tokenRepository = Container.get(TokenRepository);
 
 const generate = new Generate();
 
 describe('AuthService', () => {
   describe('login', () => {
-    it('should return the login response', async () => {
+    it('should return the login response with active game', async () => {
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
       const user: User = generate.userData();
-      const loginInput = generate.loginInput();
-      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
-      const jwt = generate.encodedJwt();
-      const loginResponse: LoginResponseDTO = generate.loginResponse();
+      user.loginCount += 1;
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
       const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
-      const spyGenerateToken = jest.spyOn(JwtService, 'generateToken').mockReturnValue(jwt);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyGetActiveGame = jest.spyOn(gameRepository, 'getActiveGameByUser').mockResolvedValue(generate.newGame());
+      const spyGenerate = jest.spyOn(JwtService, 'generateToken').mockReturnValue(generate.encodedJwt());
 
-      const result: UserResponseDTO = await authService.login(userDTO, loginInput.rememberMe);
+      const result: LoginResponseDTO = await authService.login(userDTO);
+
+      expect(result).toEqual(generate.loginResponse());
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+      expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyGetActiveGame).toHaveBeenCalledWith(user);
+      expect(spyGenerate).toHaveBeenCalledWith({ id: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, '1h');
+    });
+
+    it('should return the login response without a game', async () => {
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
+      const user: User = generate.userData();
+      user.loginCount += 1;
+      const loginResponse: LoginResponseDTO = generate.loginResponse();
+      loginResponse.game = null;
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyGetActiveGame = jest.spyOn(gameRepository, 'getActiveGameByUser').mockResolvedValue(null);
+      const spyGenerate = jest.spyOn(JwtService, 'generateToken').mockReturnValue(generate.encodedJwt());
+
+      const result: LoginResponseDTO = await authService.login(userDTO);
 
       expect(result).toEqual(loginResponse);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
       expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
-      expect(spyGenerateToken).toHaveBeenCalledWith({ id: user.id, email: user.email }, loginInput.rememberMe ? undefined : '5h');
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyGetActiveGame).toHaveBeenCalledWith(user);
+      expect(spyGenerate).toHaveBeenCalledWith({ id: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, '1h');
     });
 
     it('should throw AuthenticationFailedException if the email is incorrect', async () => {
-      const loginInput = generate.loginInput();
-      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(null);
 
-      await expect(authService.login(userDTO, loginInput.rememberMe)).rejects.toThrow(AuthenticationFailedException);
+      await expect(authService.login(userDTO)).rejects.toThrow(AuthenticationFailedException);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+    });
+
+    it('should throw AuthenticationFailedException if the user is not active', async () => {
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
+      const user: User = generate.userData();
+      user.isActive = false;
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
+
+      await expect(authService.login(userDTO)).rejects.toThrow(AuthenticationFailedException);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
     });
 
     it('should throw AuthenticationFailedException if the password is incorrect', async () => {
-      const loginInput = generate.loginInput();
-      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
       const user: User = generate.userData();
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
       const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(false);
 
-      await expect(authService.login(userDTO, loginInput.rememberMe)).rejects.toThrow(AuthenticationFailedException);
+      await expect(authService.login(userDTO)).rejects.toThrow(AuthenticationFailedException);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
       expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
     });
 
-    it('should throw DatabaseOperationFailException if the database operation fails', async () => {
-      const loginInput = generate.loginInput();
-      const userDTO: IUserPostRequest = { email: loginInput.email, password: loginInput.password };
+    it('should throw DatabaseOperationFailException if the database operation fails finding user', async () => {
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockImplementation(() => {
         throw new DatabaseOperationFailException();
       });
 
-      await expect(authService.login(userDTO, loginInput.rememberMe)).rejects.toThrow(DatabaseOperationFailException);
+      await expect(authService.login(userDTO)).rejects.toThrow(DatabaseOperationFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+    });
+
+    it('should throw DatabaseOperationFailException if the database operation fails updating user', async () => {
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
+      const user: User = generate.userData();
+      user.loginCount += 1;
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(authService.login(userDTO)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+      expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+    });
+
+    it('should throw DatabaseOperationFailException if the database operation fails finding active game', async () => {
+      const { email, password } = generate.loginInput();
+      const userDTO: IUserPostRequest = { email, password };
+      const user: User = generate.userData();
+      user.loginCount += 1;
+
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyGetActiveGame = jest.spyOn(gameRepository, 'getActiveGameByUser').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(authService.login(userDTO)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
+      expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyGetActiveGame).toHaveBeenCalledWith(user);
     });
   });
 
@@ -119,10 +197,12 @@ describe('AuthService', () => {
       expect(spyFindById).toHaveBeenCalledWith(user.id);
     });
 
-    it('should do nothing if user is not registered', async () => {
+    it('should do nothing if user is not active', async () => {
       const input = generate.forgotPasswordInput();
+      const user: User = generate.userData();
+      user.isActive = false;
 
-      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(null);
+      const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
 
       await authService.forgotPassword(input.email);
 
@@ -265,12 +345,12 @@ describe('AuthService', () => {
       expect(spyDeleteById).toHaveBeenCalledWith(input.id);
     });
 
-    it('should throw PasswordChangeFailedException if the token was not found in the database', async () => {
+    it('should throw EntityNotFoundException if the token was not found in the database', async () => {
       const input = generate.resetPasswordInput();
 
       const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(null);
 
-      await expect(authService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(PasswordChangeFailedException);
+      await expect(authService.resetPassword(input.id, input.password, input.token)).rejects.toThrow(EntityNotFoundException);
       expect(spyFindById).toHaveBeenCalledWith(input.id);
     });
 

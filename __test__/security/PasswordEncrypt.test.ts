@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { PasswordEncrypt } from '../../src/security/PasswordEncrypt';
+import { PasswordEncrypt } from '../../src/security';
 import { Generate } from '../mocks/Generate';
 
 const generate = new Generate();

@@ -18,6 +18,6 @@ export class Movie {
   @Column()
   releaseDate: Date;
 
-  @OneToMany(() => Review, review => review.movie, { cascade: true, eager: true })
+  @OneToMany(() => Review, review => review.movie, { cascade: true })
   reviews: Review[];
 }

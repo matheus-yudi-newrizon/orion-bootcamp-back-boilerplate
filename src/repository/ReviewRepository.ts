@@ -1,7 +1,7 @@
 import { Service as Repository } from 'typedi';
 import { Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
-import { Review } from '../entity/Review';
+import { Review } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
 
 @Repository()
@@ -16,7 +16,12 @@ export class ReviewRepository {
    */
   public async getRandomReview(): Promise<Review> {
     try {
-      return await this.ormRepository.createQueryBuilder('review').select().orderBy('RAND()').getOne();
+      return await this.ormRepository
+        .createQueryBuilder('review')
+        .leftJoinAndSelect('review.movie', 'movie')
+        .where('review.movieId = movie.id')
+        .orderBy('RAND()')
+        .getOne();
     } catch (error) {
       throw new DatabaseOperationFailException();
     }

@@ -16,7 +16,7 @@ export class GameReview {
   review: Review;
 
   @Column({ nullable: true })
-  answer: string;
+  answer: number;
 
   @Column({ nullable: true })
   isCorrect: boolean;
