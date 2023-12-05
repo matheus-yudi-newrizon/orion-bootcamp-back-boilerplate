@@ -101,7 +101,6 @@ export class Generate {
    */
   public gameAnswerRequest(): IGameAnswerRequest {
     const gameAnswerRequest: IGameAnswerRequest = {
-      reviewId: '4fcb0d2a19c2955e3c000e35',
       answer: 22
     };
 

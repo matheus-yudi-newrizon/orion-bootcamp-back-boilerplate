@@ -128,24 +128,6 @@ describe('GameController', () => {
       expect(response.body.success).toBe(true);
     });
 
-    it('should return 400 and RequiredFieldException for reviewId', async () => {
-      const user = generate.userPayload();
-      const jwt: string = generate.encodedJwt();
-      const gameAnswer: IGameAnswerRequest = generate.gameAnswerRequest();
-      gameAnswer.reviewId = undefined;
-
-      const spyValidateJwt = jest.spyOn(middleware, 'validateJwt').mockImplementation((req: Request, _res: Response, next: NextFunction) => {
-        (req as ICustomRequest).token = user;
-        return next();
-      });
-
-      const response = await request(app).put('/games/answer').set('Authorization', `Bearer ${jwt}`).send(gameAnswer);
-
-      expect(spyValidateJwt).toHaveBeenCalled();
-      expect(response.statusCode).toBe(400);
-      expect(response.body.success).toBe(false);
-    });
-
     it('should return 400 and RequiredFieldException for answer', async () => {
       const user = generate.userPayload();
       const jwt: string = generate.encodedJwt();
