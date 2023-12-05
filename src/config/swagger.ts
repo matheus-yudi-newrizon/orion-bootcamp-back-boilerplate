@@ -12,7 +12,7 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
       description: 'View swagger.json',
       url: '../swagger.json'
     },
-    servers: [{ url: 'http://localhost:4444' }],
+    servers: [{ url: 'http://localhost:4444' }, { url: 'https://reviewreveal.hopto.org' }],
     tags: [
       { name: 'auth', description: 'Authentication operations for users' },
       { name: 'games', description: 'Everything about your games' },
@@ -88,10 +88,6 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
         SendAnswerRequest: {
           type: 'object',
           properties: {
-            reviewId: {
-              type: 'string',
-              example: '5424a49ec3a3681eca002c23'
-            },
             answer: {
               type: 'number',
               example: 22
