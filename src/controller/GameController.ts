@@ -163,10 +163,9 @@ export class GameController {
   public async sendAnswer(req: Request, res: Response): Promise<void> {
     try {
       const jwtPayload: JwtPayload = (req as ICustomRequest).token;
-      const { reviewId, answer } = req.body;
-      const gameAnswerRequest: IGameAnswerRequest = { reviewId, answer };
+      const { answer } = req.body;
+      const gameAnswerRequest: IGameAnswerRequest = { answer };
 
-      if (!gameAnswerRequest.reviewId) throw new RequiredFieldException('reviewId');
       if (!gameAnswerRequest.answer) throw new RequiredFieldException('answer');
 
       const gameReviewResponse: GameReviewResponseDTO = await this.gameService.sendAnswer(gameAnswerRequest, jwtPayload.id);
