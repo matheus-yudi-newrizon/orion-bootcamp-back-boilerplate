@@ -12,7 +12,7 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
       description: 'View swagger.json',
       url: '../swagger.json'
     },
-    servers: [{ url: 'https://reviewreveal.hopto.org' }],
+    servers: [{ url: 'http://localhost:4444' }, { url: 'https://reviewreveal.hopto.org' }],
     tags: [
       { name: 'auth', description: 'Authentication operations for users' },
       { name: 'games', description: 'Everything about your games' },
