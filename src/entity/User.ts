@@ -19,6 +19,9 @@ export class User {
   playCount: number;
 
   @Column({ default: 0 })
+  guessCount: number;
+
+  @Column({ default: 0 })
   record: number;
 
   @Column({ default: false })

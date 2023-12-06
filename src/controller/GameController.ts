@@ -116,16 +116,34 @@ export class GameController {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/ApiResponseData'
-   *             example:
-   *               success: true
-   *               message: 'Answer computed successfully.'
-   *               data:
-   *                 isCorrect: true
-   *                 game:
-   *                   lives: 2
-   *                   record: 34
-   *                   combo: 18
-   *                   isActive: true
+   *             examples:
+   *               GameAnswerCorrect:
+   *                 value:
+   *                   success: true
+   *                   message: 'Answer computed successfully.'
+   *                   data:
+   *                     isCorrect: true
+   *                     game:
+   *                       lives: 2
+   *                       record: 34
+   *                       combo: 18
+   *                       isActive: true
+   *               GameAnswerIncorrect:
+   *                 value:
+   *                   success: true
+   *                   message: 'Answer computed successfully.'
+   *                   data:
+   *                     isCorrect: false
+   *                     game:
+   *                       lives: 1
+   *                       record: 34
+   *                       combo: 0
+   *                       isActive: true
+   *                     movie:
+   *                       title: 'Pirates of the Caribbean: The Curse of the Black Pearl'
+   *                       posterPath: '/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg'
+   *                       releaseDate: '2003-07-09'
+   *                       id: 22
    *       '400':
    *         description: Return a custom exception
    *         content:
