@@ -104,6 +104,41 @@ export class MovieController {
     }
   }
 
+  /**
+   * @swagger
+   * /movies/answer:
+   *   post:
+   *     tags:
+   *       - movies
+   *     summary: Get movie details by review
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             $ref: '#/components/schemas/MovieReviewRequest'
+   *     responses:
+   *       '200':
+   *         description: Return movie details by review
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponseData'
+   *       '400':
+   *         description: Return a custom exception
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   *       '500':
+   *         description: Return a database exception or error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/ApiResponse'
+   */
   public async getMovieByReview(req: Request, res: Response): Promise<void> {
     try {
       const jwtPayload: JwtPayload = (req as ICustomRequest).token;

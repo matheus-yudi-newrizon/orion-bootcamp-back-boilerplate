@@ -60,13 +60,13 @@ export class MovieRepository {
 
   public async getMovieByReview(review: string): Promise<Movie | null> {
     try {
-      const movie: Movie | undefined = await this.ormRepository
-        .createQueryBuilder('movie')
-        .leftJoinAndSelect('movie.reviews', 'reviews')
-        .where('reviews.review = :review', { review })
-        .getOne();
-
-      return movie;
+      return (
+        (await this.ormRepository
+          .createQueryBuilder('movie')
+          .leftJoinAndSelect('movie.reviews', 'reviews')
+          .where('reviews.review = :review', { review })
+          .getOne()) || null
+      );
     } catch (error) {
       throw new DatabaseOperationFailException();
     }

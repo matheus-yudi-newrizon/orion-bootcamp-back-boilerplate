@@ -45,17 +45,12 @@ export class MovieService {
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
   public async getMovieByReview(review: string): Promise<MovieDTO | null> {
-    try {
-      const movie: Movie | null = await this.movieRepository.getMovieByReview(review);
+    const movie: Movie | null = await this.movieRepository.getMovieByReview(review);
 
-      if (!movie) {
-        throw new EntityNotFoundException('movie');
-      }
-
-      const movieDTO = new MovieDTO(movie);
-      return movieDTO;
-    } catch (error) {
-      throw new DatabaseOperationFailException();
+    if (!movie) {
+      throw new EntityNotFoundException('movie');
     }
+
+    return new MovieDTO(movie);
   }
 }

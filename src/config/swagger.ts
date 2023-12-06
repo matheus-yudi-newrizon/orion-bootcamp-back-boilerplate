@@ -132,6 +132,15 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
               properties: {}
             }
           }
+        },
+        MovieReviewRequest: {
+          type: 'object',
+          properties: {
+            review: {
+              type: 'string'
+            }
+          },
+          required: ['review']
         }
       },
       securitySchemes: {
