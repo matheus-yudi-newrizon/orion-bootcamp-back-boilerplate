@@ -103,4 +103,32 @@ export class MovieController {
       res.status(statusCode).json(result);
     }
   }
+
+  public async getMovieByReview(req: Request, res: Response): Promise<void> {
+    try {
+      const jwtPayload: JwtPayload = (req as ICustomRequest).token;
+      const review: string = req.body?.review;
+
+      if (!review) {
+        throw new InsufficientLengthException('review', 1);
+      }
+
+      const movie: MovieDTO = await this.movieService.getMovieByReview(review);
+      const result: IControllerResponse<MovieDTO> = {
+        success: true,
+        message: 'Found movie by review successfully.',
+        data: movie
+      };
+
+      res.status(200).json(result);
+    } catch (error) {
+      const result: IControllerResponse<void> = {
+        success: false,
+        message: `${error.name}. ${error.message}`
+      };
+      const statusCode: number = error instanceof BusinessException ? error.status : 500;
+
+      res.status(statusCode).json(result);
+    }
+  }
 }

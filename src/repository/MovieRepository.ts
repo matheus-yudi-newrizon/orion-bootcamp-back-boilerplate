@@ -3,6 +3,8 @@ import { Like, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Movie } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
+import { FindOneOptions } from 'typeorm';
+import { EntityNotFoundException } from '../exception';
 
 @Repository()
 export class MovieRepository {
@@ -39,9 +41,37 @@ export class MovieRepository {
    * @returns A promise that resolves with the movie if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the database operation fails.
    */
-  public async getById(id: number): Promise<Movie[] | null> {
+  public async getById(id: number): Promise<Movie | null> {
     try {
-      return await this.ormRepository.find({ where: { id: id } });
+      return await this.ormRepository.findOne({ where: { id: id } });
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
+  }
+
+  /**
+   * Encontra filmes por uma determinada revisão.
+   * Se o filme não foi encontrado no banco de dados - retorna null.
+   *
+   * @param review - A revisão associada ao filme.
+   *
+   * @returns Uma promise que resolve com o filme se encontrado; caso contrário, null.
+   * @throws {DatabaseOperationFailException} Se a operação no banco de dados falhar.
+   */
+
+  public async getMovieByReview(review: string): Promise<Movie | null> {
+    try {
+      const movie: Movie | undefined = await this.ormRepository
+        .createQueryBuilder('movie')
+        .leftJoinAndSelect('movie.reviews', 'reviews')
+        .where('reviews.review = :review', { review })
+        .getOne();
+
+      if (!movie) {
+        throw new EntityNotFoundException('movie');
+      }
+
+      return movie;
     } catch (error) {
       throw new DatabaseOperationFailException();
     }

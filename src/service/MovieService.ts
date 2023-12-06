@@ -3,6 +3,7 @@ import { MovieDTO } from '../dto';
 import { Game, Movie, User } from '../entity';
 import { EntityNotFoundException } from '../exception';
 import { GameRepository, MovieRepository, UserRepository } from '../repository';
+import { DatabaseOperationFailException } from '../exception';
 
 @Service()
 export class MovieService {
@@ -33,5 +34,20 @@ export class MovieService {
 
     const movies: MovieDTO[] = filteredMovies.map(movie => new MovieDTO(movie));
     return movies;
+  }
+
+  public async getMovieByReview(review: string): Promise<MovieDTO | null> {
+    try {
+      const movie: Movie | null = await this.movieRepository.getMovieByReview(review);
+
+      if (!movie) {
+        throw new EntityNotFoundException('movie');
+      }
+
+      const movieDTO = new MovieDTO(movie);
+      return movieDTO;
+    } catch (error) {
+      throw new DatabaseOperationFailException();
+    }
   }
 }
