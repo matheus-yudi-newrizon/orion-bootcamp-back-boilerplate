@@ -32,7 +32,7 @@ export class GameController {
    *               message: 'Game created successfully.'
    *               data:
    *                 lives: 2
-   *                 record: 40
+   *                 record: 0
    *                 combo: 0
    *                 isActive: true
    *       '400':

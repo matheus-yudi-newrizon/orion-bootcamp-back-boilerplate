@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import request from 'supertest';
 import { Container } from 'typedi';
@@ -7,6 +8,7 @@ import {
   DatabaseOperationFailException,
   EmailNotValidException,
   EntityNotFoundException,
+  InvalidJwtTokenException,
   OperationFailException,
   PasswordChangeFailedException,
   PasswordMismatchException,
@@ -21,6 +23,7 @@ import { UserRequestValidator } from '../../src/validation/UserRequestValidator'
 import { Generate } from '../mocks/Generate';
 
 const app = express();
+app.use(cookieParser());
 app.use(express.json());
 app.use(routes);
 
@@ -387,7 +390,7 @@ describe('AuthController', () => {
     });
   });
 
-  describe('POST /auth/reset-password', () => {
+  describe('PUT /auth/reset-password', () => {
     it('should return 200 and success true', async () => {
       const userRequest = generate.resetPasswordInput();
 
@@ -536,6 +539,125 @@ describe('AuthController', () => {
       expect(spyResetPassword).toHaveBeenCalledWith(userRequest.id, userRequest.password, userRequest.token);
       expect(spyResetPassword).toThrow(Error);
       expect(response.statusCode).toBe(500);
+    });
+  });
+
+  describe('POST /auth/refresh-token', () => {
+    it('should return 201 and refresh JWT tokens', async () => {
+      const decoded = generate.userPayload();
+      const jwt = generate.encodedJwt();
+      const cookie = generate.cookieData();
+
+      const spyVerifyToken = jest.spyOn(JwtService, 'verifyToken').mockReturnValue(decoded);
+      const spyGenerateRefreshToken = jest.spyOn(JwtService, 'generateToken').mockReturnValue(jwt);
+      const spyGenerateAccessToken = jest.spyOn(JwtService, 'generateToken').mockReturnValue(jwt);
+
+      const response = await request(app).post('/auth/refresh-token').set('Cookie', cookie).send({});
+
+      expect(spyVerifyToken).toHaveBeenCalledWith(jwt, process.env.REFRESH_TOKEN_SECRET);
+      expect(spyGenerateRefreshToken).toHaveBeenCalledWith(decoded, process.env.REFRESH_TOKEN_SECRET, '24h');
+      expect(spyGenerateAccessToken).toHaveBeenCalledWith(decoded, process.env.ACCESS_TOKEN_SECRET, '1h');
+      expect(response.statusCode).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data).toBe(jwt);
+    });
+
+    it('should return 401 and InvalidJwtTokenException', async () => {
+      const jwt = generate.encodedJwt();
+      const cookie = generate.cookieData();
+
+      const spyVerifyToken = jest.spyOn(JwtService, 'verifyToken').mockImplementation(() => {
+        throw new InvalidJwtTokenException('InvalidJwt', 'Invalid token');
+      });
+
+      const response = await request(app).post('/auth/refresh-token').set('Cookie', cookie).send({});
+
+      expect(spyVerifyToken).toHaveBeenCalledWith(jwt, process.env.REFRESH_TOKEN_SECRET);
+      expect(response.statusCode).toBe(401);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 401 and JsonWebTokenError', async () => {
+      const response = await request(app).post('/auth/refresh-token').set('Cookie', '').send({});
+
+      expect(response.statusCode).toBe(401);
+      expect(response.body.success).toBe(false);
+    });
+  });
+
+  describe('PUT /auth/confirm-email', () => {
+    it('should return 200 and a success message', async () => {
+      const input = generate.confirmEmailInput();
+
+      const spyConfirmEmail = jest.spyOn(authService, 'confirmEmail').mockResolvedValue();
+
+      const response = await request(app).put('/auth/confirm-email').send(input);
+
+      expect(spyConfirmEmail).toHaveBeenCalledWith(input.id, input.token);
+      expect(response.statusCode).toBe(200);
+      expect(response.body.success).toBe(true);
+    });
+
+    it('should return 400 and EntityNotFoundException', async () => {
+      const input = generate.confirmEmailInput();
+
+      const spyConfirmEmail = jest.spyOn(authService, 'confirmEmail').mockImplementation(() => {
+        throw new EntityNotFoundException('token');
+      });
+
+      const response = await request(app).put('/auth/confirm-email').send(input);
+
+      expect(spyConfirmEmail).toHaveBeenCalledWith(input.id, input.token);
+      expect(response.statusCode).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 400 and OperationFailException', async () => {
+      const input = generate.confirmEmailInput();
+
+      const spyConfirmEmail = jest.spyOn(authService, 'confirmEmail').mockImplementation(() => {
+        throw new OperationFailException('The token is not valid.');
+      });
+
+      const response = await request(app).put('/auth/confirm-email').send(input);
+
+      expect(spyConfirmEmail).toHaveBeenCalledWith(input.id, input.token);
+      expect(response.statusCode).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 500 and DatabaseOperationFailException', async () => {
+      const input = generate.confirmEmailInput();
+
+      const spyConfirmEmail = jest.spyOn(authService, 'confirmEmail').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      const response = await request(app).put('/auth/confirm-email').send(input);
+
+      expect(spyConfirmEmail).toHaveBeenCalledWith(input.id, input.token);
+      expect(response.statusCode).toBe(500);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 400 and RequiredFieldException for id', async () => {
+      const input = generate.confirmEmailInput();
+      input.id = undefined;
+
+      const response = await request(app).put('/auth/confirm-email').send(input);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.success).toBe(false);
+    });
+
+    it('should return 400 and RequiredFieldException for token', async () => {
+      const input = generate.confirmEmailInput();
+      input.token = undefined;
+
+      const response = await request(app).put('/auth/confirm-email').send(input);
+
+      expect(response.statusCode).toBe(400);
+      expect(response.body.success).toBe(false);
     });
   });
 });
