@@ -36,6 +36,14 @@ export class MovieService {
     return movies;
   }
 
+  /**
+   * Retrieves a movie based on a given review.
+   *
+   * @param review - The review associated with the movie.
+   * @returns A MovieDTO object representing the movie.
+   * @throws {EntityNotFoundException} If the movie is not found.
+   * @throws {DatabaseOperationFailException} If the database operation fails.
+   */
   public async getMovieByReview(review: string): Promise<MovieDTO | null> {
     try {
       const movie: Movie | null = await this.movieRepository.getMovieByReview(review);

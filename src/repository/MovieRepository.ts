@@ -50,13 +50,13 @@ export class MovieRepository {
   }
 
   /**
-   * Encontra filmes por uma determinada revisão.
-   * Se o filme não foi encontrado no banco de dados - retorna null.
+   * Finds movies by a given review.
+   * If the movie was not found in the database - returns null.
    *
-   * @param review - A revisão associada ao filme.
+   * @param review -The review associated with the film.
    *
-   * @returns Uma promise que resolve com o filme se encontrado; caso contrário, null.
-   * @throws {DatabaseOperationFailException} Se a operação no banco de dados falhar.
+   * @returns A promise that resolves with the movie if found; otherwise, null.
+   * @throws {DatabaseOperationFailException} If the operation on the database fails.
    */
 
   public async getMovieByReview(review: string): Promise<Movie | null> {
