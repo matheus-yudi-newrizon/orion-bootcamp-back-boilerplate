@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
 import { MovieDTO } from '../dto';
-import { BusinessException, InsufficientLengthException } from '../exception';
+import { BusinessException, RequiredFieldException, InsufficientLengthException } from '../exception';
 import { IControllerResponse, ICustomRequest } from '../interface';
 import { MovieService } from '../service';
 
@@ -110,9 +110,8 @@ export class MovieController {
       const review: string = req.body?.review;
 
       if (!review) {
-        throw new InsufficientLengthException('review', 1);
+        throw new RequiredFieldException('review');
       }
-
       const movie: MovieDTO = await this.movieService.getMovieByReview(review);
       const result: IControllerResponse<MovieDTO> = {
         success: true,
