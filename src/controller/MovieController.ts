@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { Service as Controller } from 'typedi';
 import { MovieDTO } from '../dto';
-import { BusinessException } from '../exception';
+import { BusinessException, InsufficientLengthException } from '../exception';
 import { IControllerResponse, ICustomRequest } from '../interface';
 import { MovieService } from '../service';
 
@@ -82,6 +82,8 @@ export class MovieController {
     try {
       const jwtPayload: JwtPayload = (req as ICustomRequest).token;
       const title: string = req.query['title'] as string;
+
+      if (title.length < 4) throw new InsufficientLengthException('title', 4);
 
       const movies: MovieDTO[] = await this.movieService.searchMoviesByTitle(jwtPayload.id, title);
       const result: IControllerResponse<MovieDTO[]> = {

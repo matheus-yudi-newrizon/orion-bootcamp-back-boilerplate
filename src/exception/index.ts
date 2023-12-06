@@ -4,6 +4,7 @@ export * from './DatabaseOperationFailException';
 export * from './EmailNotValidException';
 export * from './EntityNotFoundException';
 export * from './GameIsActiveException';
+export * from './InsufficientLengthException';
 export * from './InvalidJwtTokenException';
 export * from './InvalidQueryException';
 export * from './OperationFailException';
