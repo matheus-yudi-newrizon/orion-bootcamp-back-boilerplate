@@ -123,6 +123,7 @@ export class Generate {
       password: userPostRequest.password,
       loginCount: 0,
       playCount: 0,
+      guessCount: 0,
       record: 0,
       isActive,
       createdAt: new Date(),
@@ -292,6 +293,7 @@ export class Generate {
   public gameReviewData(): GameReview {
     const game: Game = this.gameData();
     const review: Review = this.reviewData();
+    const movie: Movie = this.movieData();
 
     const gameReview: GameReview = {
       id: 1,
@@ -302,6 +304,8 @@ export class Generate {
       createdAt: new Date()
     };
     gameReview.game.currentGameReview = gameReview;
+    review.movie = movie;
+    gameReview.review = review;
 
     return gameReview;
   }
@@ -320,10 +324,15 @@ export class Generate {
   /**
    * Generates a mock of game review response DTO.
    *
+   * @param gameAnswer - The game answer sent by the user.
+   *
    * @returns A GameReviewResponseDTO with the mocked data.
    */
-  gameReviewResponse(): GameReviewResponseDTO {
+  public gameReviewResponse(gameAnswer: IGameAnswerRequest): GameReviewResponseDTO {
     const gameReview: GameReview = this.gameReviewData();
+    gameReview.answer = gameAnswer.answer;
+    gameReview.isCorrect = gameReview.answer === gameReview.review.movie.id;
+
     const game: GameResponseDTO = this.gameResponse();
 
     return new GameReviewResponseDTO(gameReview, game);
