@@ -3,7 +3,6 @@ import { Like, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Movie } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
-import { FindOneOptions } from 'typeorm';
 import { EntityNotFoundException } from '../exception';
 
 @Repository()
@@ -66,10 +65,6 @@ export class MovieRepository {
         .leftJoinAndSelect('movie.reviews', 'reviews')
         .where('reviews.review = :review', { review })
         .getOne();
-
-      if (!movie) {
-        throw new EntityNotFoundException('movie');
-      }
 
       return movie;
     } catch (error) {
