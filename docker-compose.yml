@@ -24,6 +24,7 @@ services:
       EMAIL_SERVICE: gmail
       EMAIL_USERNAME: bellatriximdb@gmail.com
       EMAIL_PASSWORD: ttul nlfm faec svhf
+      MOVIE_REVIEW_KEYWORD: "review"
     networks:
       - orion-connect
 

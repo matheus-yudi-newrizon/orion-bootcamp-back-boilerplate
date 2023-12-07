@@ -3,7 +3,6 @@ import { MovieDTO } from '../dto';
 import { Game, Movie, User } from '../entity';
 import { EntityNotFoundException } from '../exception';
 import { GameRepository, MovieRepository, UserRepository } from '../repository';
-import { DatabaseOperationFailException } from '../exception';
 
 @Service()
 export class MovieService {

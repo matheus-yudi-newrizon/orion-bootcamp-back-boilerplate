@@ -79,6 +79,7 @@ export class GameService {
       game.isActive = game.lives > 0;
     }
 
+    user.guessCount++;
     game.currentGameReview = null;
     await this.gameRepository.update(game.id, game);
     await this.userRepository.update(user.id, user);

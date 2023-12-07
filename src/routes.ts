@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Container } from 'typedi';
 import { AuthController, GameController, MovieController, ReviewController } from './controller';
 import { validateJwt, validateQuery } from './middleware';
+import { validateReview } from 'middleware/validateReview';
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.post('/auth/login', (req, res) => authController.login(req, res));
 router.post('/auth/refresh-token', (req, res) => authController.refreshToken(req, res));
 
 router.get('/movies', validateQuery(['title']), validateJwt, (req, res) => movieController.searchMovies(req, res));
-router.get('/movies/answer', validateJwt, (req, res) => movieController.getMovieByReview(req, res));
+router.get('/movies/answer', validateJwt, validateReview, (req, res) => movieController.getMovieByReview(req, res));
 
 router.post('/games/new', validateJwt, (req, res) => gameController.newGame(req, res));
 router.put('/games/answer', validateJwt, (req, res) => gameController.sendAnswer(req, res));
