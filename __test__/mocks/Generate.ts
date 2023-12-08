@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from 'express';
 import { GameResponseDTO, GameReviewResponseDTO, LoginResponseDTO, UserResponseDTO } from '../../src/dto';
 import { Game, GameReview, Movie, Review, Token, User } from '../../src/entity';
 import { IGameAnswerRequest, IUserPostRequest } from '../../src/interface';
@@ -336,5 +337,41 @@ export class Generate {
     const game: GameResponseDTO = this.gameResponse();
 
     return new GameReviewResponseDTO(gameReview, game);
+  }
+
+  /**
+   * Generates a mock of request.
+   *
+   * @returns A Partial Request.
+   */
+  public mockRequest(): Partial<Request> {
+    const req = {} as Request;
+    req.headers = {};
+    req.body = {};
+    req.query = {};
+
+    return req;
+  }
+
+  /**
+   * Generates a mock of response.
+   *
+   * @returns A Partial Response.
+   */
+  public mockResponse(): Partial<Response> {
+    const res = {} as Response;
+    res.json = jest.fn();
+    res.status = jest.fn(() => res);
+
+    return res;
+  }
+
+  /**
+   * Generates a mock of next function.
+   *
+   * @returns A NextFunction.
+   */
+  public nextFunction(): NextFunction {
+    return jest.fn();
   }
 }
