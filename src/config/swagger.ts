@@ -5,7 +5,11 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
     openapi: '3.0.0',
     info: {
       title: 'Review Reveal API',
-      description: 'Review Reveal API documentation.',
+      description:
+        'Review Reveal API documentation.\n\n' +
+        'Some useful links:\n' +
+        '- [Bellatrix - IMDB ReviewReveal (PDF, 618kB)](https://cdn.discordapp.com/attachments/1156342600626880522/1182400872861413386/Bellatrix_-_IMDb_ReviewReveal_-_Entrega.pdf?ex=65848fa0&is=65721aa0&hm=f3d102580efd4829a2bad11582297f2bea7717c0aa223988ca34bdf67c54fd90&)\n' +
+        '- [API code coverage](https://reviewreveal.hopto.org/coverage)',
       version: '1.0.0'
     },
     externalDocs: {
