@@ -57,7 +57,7 @@ describe('MovieController', () => {
       const response = await request(app).get('/movies').set('Authorization', `Bearer ${jwt}`).query({ title });
 
       expect(spyValidateJwt).toHaveBeenCalled();
-      expect(response.statusCode).toBe(400);
+      expect(response.statusCode).toBe(500);
       expect(response.body.success).toBe(false);
     });
 

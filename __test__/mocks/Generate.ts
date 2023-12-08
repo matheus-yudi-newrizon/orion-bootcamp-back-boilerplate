@@ -359,7 +359,8 @@ export class Generate {
     const review: Review = this.reviewData();
 
     return new ReviewDTO(review);
-    
+  }
+
   /**
    * Generates a mock of request.
    *
