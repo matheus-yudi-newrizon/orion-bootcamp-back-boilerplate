@@ -6,6 +6,7 @@ import { IControllerResponse } from '../interface';
  * Middleware to validate if the request contains query params.
  *
  * @param fields - An array of strings containing names of the expected params.
+ * @returns A function that checks if the fields are present in query params.
  */
 export function validateQuery(fields: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
