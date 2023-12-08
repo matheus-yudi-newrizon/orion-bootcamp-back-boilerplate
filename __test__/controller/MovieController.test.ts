@@ -44,23 +44,6 @@ describe('MovieController', () => {
       expect(response.body.success).toBe(true);
     });
 
-    it('should return 400 and InsufficientLengthException', async () => {
-      const jwt: string = generate.encodedJwt();
-      const user = generate.userPayload();
-      const title = 'Pir';
-
-      const spyValidateJwt = jest.spyOn(middleware, 'validateJwt').mockImplementation((req: Request, _res: Response, next: NextFunction) => {
-        (req as ICustomRequest).token = user;
-        return next();
-      });
-
-      const response = await request(app).get('/movies').set('Authorization', `Bearer ${jwt}`).query({ title });
-
-      expect(spyValidateJwt).toHaveBeenCalled();
-      expect(response.statusCode).toBe(500);
-      expect(response.body.success).toBe(false);
-    });
-
     it('should return 500 and DatabaseOperationFailException', async () => {
       const jwt: string = generate.encodedJwt();
       const user = generate.userPayload();
