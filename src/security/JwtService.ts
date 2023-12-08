@@ -22,7 +22,8 @@ export class JwtService {
    * @param token - JWT token to be verified.
    * @param secretKey - The secret key used in the sign method.
    *
-   * @returns Decoded data from the token or null if the token is invalid.
+   * @returns Decoded data from the token if it is valid.
+   * @throws InvalidJwtTokenException if the token is invalid.
    */
   public static verifyToken(token: string, secretKey: string): string | JwtPayload {
     try {
