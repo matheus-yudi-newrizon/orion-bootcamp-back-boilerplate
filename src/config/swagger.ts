@@ -111,6 +111,19 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
             }
           }
         },
+        MovieReviewRequest: {
+          type: 'object',
+          properties: {
+            reviewText: {
+              type: 'string',
+              example: `Having been deposed by his crew, "Capt. Jack Sparrow" (Johnny Depp) arrives in Port Royal with little but the clothes he stands up in. He turns up just as the governor's daughter "Elizabeth" (Keira Knightley) is having to fend off the rather unwanted matrimonial intentions of "Norrington" (Jack Davenport). She has designs on the blacksmith's apprentice - "Turner" (a handsome but insipid, sorry, Orlando Bloom) whom she rescued from a pirate raid many years earlier. "Sparrow" would prove an excellent catch for "Norrington" but thanks to an hot poker, a donkey and some legerdemain at sea, he and "Turner" are soon abroad on the trail of his old crew and of the legendary pirates who sail the seas in the "Black Pearl" seeking an odd sort of salvation! What now ensues are some pacily directed escapades with loads of attitude, swash and buckle. Some pithy dialogue and a rousing (if slightly repetitive) score from Klaus Badelt take us criss-crossing the Caribbean constantly jumping from frying pan to fire. The star for me here is certainly Geoffrey Rush. A man who rarely disappoints, and on this occasion brings a comically potent degree of menace as his "Barbossa" character ensures that the plot thickens and the story gathers momentum. It's a bit on the long side - there are a few sagging moments now and again, but a solid supporting cast led by Kevin McNally provide some borderline slapstick humour, occasionally tempered by the dignified persona of an underused Jonathan Pryce's "Gov. Swann" and an whole suite of powdered wigs. The visual effects are top drawer and the story well worth a watch on a big screen to do justice to the imagery and the best traditions of seafaring yarns.`
+            },
+            keyword: {
+              type: 'string',
+              example: process.env.MOVIE_REVIEW_KEYWORD
+            }
+          }
+        },
         ApiResponse: {
           type: 'object',
           properties: {
