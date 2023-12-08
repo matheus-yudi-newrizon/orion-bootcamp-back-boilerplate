@@ -23,13 +23,14 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ origin: true }));
 app.use(routes);
+app.use('/coverage', express.static(__dirname + '/../coverage/lcov-report'));
 
 const swaggerSpec = swaggerJSDoc(swaggerConfig);
 
 app.use('/swagger', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 app.get('/swagger.json', (_req, res) => res.send(swaggerSpec));
 
-console.log(`Add swagger on /swagger`);
+console.log('Add swagger on /swagger');
 
 app.listen(process.env.SERVER_PORT, () => {
   console.log(`Server listening on port ${process.env.SERVER_PORT}`);
