@@ -178,7 +178,7 @@ export class AuthController {
 
       if (rememberMe) {
         const refreshToken = JwtService.generateToken({ id: decoded.id, email: decoded.email }, process.env.REFRESH_TOKEN_SECRET, '24h');
-        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'none', secure: true });
       }
 
       const result: IControllerResponse<LoginResponseDTO> = {
@@ -393,7 +393,7 @@ export class AuthController {
         data: accessToken
       };
 
-      res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' }).status(201).json(result);
+      res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'none', secure: true }).status(201).json(result);
     } catch (error) {
       const result: IControllerResponse<UserResponseDTO> = {
         success: false,
