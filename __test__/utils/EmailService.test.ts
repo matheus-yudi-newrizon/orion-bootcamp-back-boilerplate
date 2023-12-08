@@ -36,7 +36,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
       expect(spyReadFile).toHaveBeenCalledWith(template, 'utf8');
       expect(spyCompile).toHaveBeenCalledWith(source);
       expect(compiledTemplate).toHaveBeenCalledWith(payload);
@@ -71,7 +71,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
       expect(spyReadFile).toHaveBeenCalledWith(template, 'utf8');
       expect(spyCompile).toHaveBeenCalledWith(source);
       expect(compiledTemplate).toHaveBeenCalledWith(payload);
@@ -105,7 +105,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
       expect(spyReadFile).toHaveBeenCalledWith(template, 'utf8');
       expect(spyCompile).toHaveBeenCalledWith(source);
       expect(compiledTemplate).toHaveBeenCalledWith(payload);
@@ -136,7 +136,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
       expect(spyReadFile).toHaveBeenCalledWith(template, 'utf8');
       expect(spyCompile).toHaveBeenCalledWith(source);
       expect(compiledTemplate).toHaveBeenCalledWith(payload);
@@ -165,7 +165,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
       expect(spyReadFile).toHaveBeenCalledWith(template, 'utf8');
       expect(spyCompile).toHaveBeenCalledWith(source);
     });
@@ -191,7 +191,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
       expect(spyReadFile).toHaveBeenCalledWith(template, 'utf8');
     });
 
@@ -215,7 +215,7 @@ describe('EmailService', () => {
           pass: process.env.EMAIL_PASSWORD
         }
       });
-      expect(spyJoin).toHaveBeenCalledWith('/home/rogeriofrsouza/Documents/review-reveal-api/src/utils', template);
+      expect(spyJoin).toHaveBeenCalledWith(process.cwd() + '/src/utils', template);
     });
 
     it('should throw Error if createTransport fails', async () => {
