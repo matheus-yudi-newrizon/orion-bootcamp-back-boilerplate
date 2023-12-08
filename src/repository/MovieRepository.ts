@@ -3,7 +3,6 @@ import { Like, Repository as TypeOrmRepository } from 'typeorm';
 import { MysqlDataSource } from '../config/database';
 import { Movie } from '../entity';
 import { DatabaseOperationFailException } from '../exception';
-import { EntityNotFoundException } from '../exception';
 
 @Repository()
 export class MovieRepository {
@@ -32,7 +31,7 @@ export class MovieRepository {
   }
 
   /**
-   * Finds movies by a given id.
+   * Finds movie by a given id.
    * If movie was not found in the database - returns null.
    *
    * @param id - The id of the movie to retrieve.
@@ -49,24 +48,21 @@ export class MovieRepository {
   }
 
   /**
-   * Finds movies by a given review.
+   * Finds movie by a given review text.
    * If the movie was not found in the database - returns null.
    *
-   * @param review -The review associated with the film.
+   * @param reviewText - The review text associated with the movie.
    *
    * @returns A promise that resolves with the movie if found; otherwise, null.
    * @throws {DatabaseOperationFailException} If the operation on the database fails.
    */
-
-  public async getMovieByReview(review: string): Promise<Movie | null> {
+  public async getMovieByReview(reviewText: string): Promise<Movie | null> {
     try {
-      return (
-        (await this.ormRepository
-          .createQueryBuilder('movie')
-          .leftJoinAndSelect('movie.reviews', 'reviews')
-          .where('reviews.review = :review', { review })
-          .getOne()) || null
-      );
+      return await this.ormRepository
+        .createQueryBuilder('movie')
+        .leftJoinAndSelect('movie.reviews', 'review')
+        .where('review.text = :reviewText', { reviewText })
+        .getOne();
     } catch (error) {
       throw new DatabaseOperationFailException();
     }

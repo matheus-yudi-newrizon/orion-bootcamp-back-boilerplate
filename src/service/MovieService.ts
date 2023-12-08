@@ -15,6 +15,7 @@ export class MovieService {
   /**
    * Search movies by title.
    *
+   * @param userId - The id of the user.
    * @param title - The title of the movie.
    *
    * @returns A promise that resolves with the filtered movies.
@@ -36,19 +37,24 @@ export class MovieService {
   }
 
   /**
-   * Retrieves a movie based on a given review.
+   * Retrieves a movie based on a given review text.
    *
-   * @param review - The review associated with the movie.
-   * @returns A MovieDTO object representing the movie.
-   * @throws {EntityNotFoundException} If the movie is not found.
-   * @throws {DatabaseOperationFailException} If the database operation fails.
+   * @param userId - The id of the user.
+   * @param reviewText - The text of the review associated with the movie.
+   *
+   * @returns A promise that resolves with the movie.
+   * @throws {EntityNotFoundException} if the user, game or movie was not found in database.
+   * @throws {DatabaseOperationFailException} if the database operation fails.
    */
-  public async getMovieByReview(review: string): Promise<MovieDTO | null> {
-    const movie: Movie | null = await this.movieRepository.getMovieByReview(review);
+  public async getMovieByReview(userId: number, reviewText: string): Promise<MovieDTO> {
+    const user: User = await this.userRepository.getById(userId);
+    if (!user) throw new EntityNotFoundException('user');
 
-    if (!movie) {
-      throw new EntityNotFoundException('movie');
-    }
+    const game: Game = await this.gameRepository.getActiveGameByUser(user);
+    if (!game) throw new EntityNotFoundException('game');
+
+    const movie: Movie = await this.movieRepository.getMovieByReview(reviewText);
+    if (!movie) throw new EntityNotFoundException('movie');
 
     return new MovieDTO(movie);
   }
