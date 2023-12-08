@@ -21,7 +21,7 @@ const app = express();
 
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors({ origin: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(routes);
 
 const swaggerSpec = swaggerJSDoc(swaggerConfig);
