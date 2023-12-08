@@ -1,4 +1,4 @@
-import { GameResponseDTO, GameReviewResponseDTO, LoginResponseDTO, UserResponseDTO } from '../../src/dto';
+import { GameResponseDTO, GameReviewResponseDTO, LoginResponseDTO, MovieDTO, ReviewDTO, UserResponseDTO } from '../../src/dto';
 import { Game, GameReview, Movie, Review, Token, User } from '../../src/entity';
 import { IGameAnswerRequest, IUserPostRequest } from '../../src/interface';
 
@@ -307,6 +307,17 @@ export class Generate {
   }
 
   /**
+   * Generates a mock of movie response DTO.
+   *
+   * @returns A MovieDTO with the mocked data.
+   */
+  public movieResponse(): MovieDTO {
+    const movie: Movie = this.movieData();
+
+    return new MovieDTO(movie);
+  }
+
+  /**
    * Generates a mock of game response DTO.
    *
    * @returns A GameResponseDTO with the mocked data.
@@ -327,5 +338,16 @@ export class Generate {
     const game: GameResponseDTO = this.gameResponse();
 
     return new GameReviewResponseDTO(gameReview, game);
+  }
+
+  /**
+   * Generates a mock of review response DTO.
+   *
+   * @returns A ReviewDTO with the mocked data.
+   */
+  public reviewResponse(): ReviewDTO {
+    const review: Review = this.reviewData();
+
+    return new ReviewDTO(review);
   }
 }
