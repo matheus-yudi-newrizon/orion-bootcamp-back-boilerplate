@@ -9,7 +9,7 @@ import { JwtService } from '../security';
 export function validateJwt(req: Request, res: Response, next: NextFunction) {
   try {
     const bearerHeader: string = req.headers['authorization'];
-    if (!bearerHeader) throw new JsonWebTokenError('Invalid token.');
+    if (!bearerHeader) throw new JsonWebTokenError('No access token provided.');
 
     const accessToken: string = bearerHeader.split(' ')[1];
 

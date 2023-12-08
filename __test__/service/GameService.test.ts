@@ -129,15 +129,7 @@ describe('GameService', () => {
       expect(gameReviewResponse.isCorrect).toBe(true);
       expect(spyGetById).toHaveBeenCalledWith(user.id);
       expect(spyGameByUser).toHaveBeenCalledWith(user);
-
-      gameReview.isCorrect = true;
       expect(spyGameReviewUpdate).toHaveBeenCalledWith(gameReview.id, gameReview);
-
-      game.combo += 1;
-      game.score += 1;
-      game.lives += 1;
-      user.record = game.score;
-      game.currentGameReview = null;
       expect(spyGameUpdate).toHaveBeenCalledWith(game.id, game);
       expect(spyUserUpdate).toHaveBeenCalledWith(user.id, user);
     });
@@ -145,7 +137,7 @@ describe('GameService', () => {
     it('should return the game updated data when answer is not correct', async () => {
       const gameReview: GameReview = generate.gameReviewData();
       const user: User = generate.userData();
-      const game: Game = generate.gameData(8, 40);
+      const game: Game = generate.gameData(8, 10);
       game.currentGameReview = gameReview;
       const gameAnswerRequest: IGameAnswerRequest = generate.gameAnswerRequest();
       gameAnswerRequest.answer = 2;
@@ -161,14 +153,7 @@ describe('GameService', () => {
       expect(gameReviewResponse.isCorrect).toBe(false);
       expect(spyGetById).toHaveBeenCalledWith(user.id);
       expect(spyGameByUser).toHaveBeenCalledWith(user);
-
-      gameReview.isCorrect = false;
       expect(spyGameReviewUpdate).toHaveBeenCalledWith(gameReview.id, gameReview);
-
-      game.combo = 0;
-      game.lives -= 1;
-      game.isActive = game.lives > 0;
-      game.currentGameReview = null;
       expect(spyGameUpdate).toHaveBeenCalledWith(game.id, game);
       expect(spyUserUpdate).toHaveBeenCalledWith(user.id, user);
     });

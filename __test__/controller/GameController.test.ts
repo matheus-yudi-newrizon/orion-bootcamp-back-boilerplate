@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import request from 'supertest';
 import { Container } from 'typedi';
-import { GameResponseDTO } from '../../src/dto';
+import { GameResponseDTO, GameReviewResponseDTO } from '../../src/dto';
 import { DatabaseOperationFailException, EmailNotValidException, EntityNotFoundException, GameIsActiveException } from '../../src/exception';
 import { ICustomRequest, IGameAnswerRequest } from '../../src/interface';
 import * as middleware from '../../src/middleware';
@@ -109,16 +109,17 @@ describe('GameController', () => {
   });
 
   describe('PUT /games/answer', () => {
-    it('should return 201 and the updated game data', async () => {
+    it('should return 201 and the updated game data if answer is correct', async () => {
       const user = generate.userPayload();
       const jwt: string = generate.encodedJwt();
       const gameAnswer: IGameAnswerRequest = generate.gameAnswerRequest();
+      const gameReviewResponse: GameReviewResponseDTO = generate.gameReviewResponse(gameAnswer);
 
       const spyValidateJwt = jest.spyOn(middleware, 'validateJwt').mockImplementation((req: Request, _res: Response, next: NextFunction) => {
         (req as ICustomRequest).token = user;
         return next();
       });
-      const spySendAnswer = jest.spyOn(gameService, 'sendAnswer').mockResolvedValue(generate.gameReviewResponse());
+      const spySendAnswer = jest.spyOn(gameService, 'sendAnswer').mockResolvedValue(gameReviewResponse);
 
       const response = await request(app).put('/games/answer').set('Authorization', `Bearer ${jwt}`).send(gameAnswer);
 
@@ -126,6 +127,29 @@ describe('GameController', () => {
       expect(spySendAnswer).toHaveBeenCalledWith(gameAnswer, user.id);
       expect(response.statusCode).toBe(201);
       expect(response.body.success).toBe(true);
+      expect(response.body.data).toEqual(gameReviewResponse);
+    });
+
+    it('should return 201, the updated game data and movie data if answer is incorrect', async () => {
+      const user = generate.userPayload();
+      const jwt: string = generate.encodedJwt();
+      const gameAnswer: IGameAnswerRequest = generate.gameAnswerRequest();
+      gameAnswer.answer = 1;
+      const gameReviewResponse: GameReviewResponseDTO = generate.gameReviewResponse(gameAnswer);
+
+      const spyValidateJwt = jest.spyOn(middleware, 'validateJwt').mockImplementation((req: Request, _res: Response, next: NextFunction) => {
+        (req as ICustomRequest).token = user;
+        return next();
+      });
+      const spySendAnswer = jest.spyOn(gameService, 'sendAnswer').mockResolvedValue(gameReviewResponse);
+
+      const response = await request(app).put('/games/answer').set('Authorization', `Bearer ${jwt}`).send(gameAnswer);
+
+      expect(spyValidateJwt).toHaveBeenCalled();
+      expect(spySendAnswer).toHaveBeenCalledWith(gameAnswer, user.id);
+      expect(response.statusCode).toBe(201);
+      expect(response.body.success).toBe(true);
+      expect(response.body.data.movie.id).toEqual(gameReviewResponse.movie.id);
     });
 
     it('should return 400 and RequiredFieldException for answer', async () => {
