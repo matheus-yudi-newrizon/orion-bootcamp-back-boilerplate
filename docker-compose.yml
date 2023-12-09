@@ -22,9 +22,15 @@ services:
       DB_CONNECTION_STRING: mysql://orion_root:j5m966qp7jiypfda@orion-mysql:3306
       CLIENT_URL: https://matheus-yudi-newrizon.github.io/review-reveal-web
       MOVIE_REVIEW_KEYWORD: review
-      EMAIL_SERVICE: outlook
-      EMAIL_USERNAME: bellatriximdb@outlook.com
-      EMAIL_PASSWORD: Bell@trix2023
+      EMAIL_SERVICE: gmail
+      EMAIL_USERNAME: bellatriximdb@gmail.com
+      EMAIL_PASSWORD: ttul nlfm faec svhf
+      EMAIL_SERVICE_2: outlook
+      EMAIL_USERNAME_2: bellatriximdb@outlook.com
+      EMAIL_PASSWORD_2: Bell@trix2023
+      EMAIL_SERVICE_3: gmail
+      EMAIL_USERNAME_3: squadbellatrix1@gmail.com
+      EMAIL_PASSWORD_3: vdrs sitv caat urlr
     networks:
       - orion-connect
 
