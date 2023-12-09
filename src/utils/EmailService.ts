@@ -3,7 +3,6 @@ import handlebars from 'handlebars';
 import nodemailer, { SentMessageInfo, Transporter } from 'nodemailer';
 import path from 'path';
 import { Service } from 'typedi';
-import { SendEmailFailException } from '../exception';
 
 /**
  * Class for email service actions.
@@ -19,7 +18,6 @@ export class EmailService {
    * @param template - The path to a HTML template handlebars.
    *
    * @returns A promise that resolves with void.
-   * @throws {SendEmailFailException} if there is a failure sending email.
    */
   public static async sendEmail(email: string, subject: string, payload: unknown, template: string): Promise<void> {
     const transporter: Transporter = nodemailer.createTransport({
@@ -41,13 +39,15 @@ export class EmailService {
     };
 
     transporter.verify(function (error: Error) {
-      if (error) throw new SendEmailFailException(error.message);
+      if (error) console.log(error.message);
     });
 
     transporter.sendMail(options, (error: Error, info: SentMessageInfo) => {
-      if (error) throw new SendEmailFailException(error.message);
-
-      console.log('Message sent: ' + info.messageId);
+      if (error) {
+        console.log(error.message);
+      } else {
+        console.log('Message sent: ' + info.messageId);
+      }
     });
   }
 }
