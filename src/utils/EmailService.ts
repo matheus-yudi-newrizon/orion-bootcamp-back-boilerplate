@@ -1,6 +1,6 @@
 import fs from 'fs';
 import handlebars from 'handlebars';
-import nodemailer, { SentMessageInfo, Transporter } from 'nodemailer';
+import nodemailer, { Transporter } from 'nodemailer';
 import path from 'path';
 import { Service } from 'typedi';
 
@@ -78,14 +78,29 @@ export class EmailService {
       });
     });
 
-    transporters[0].sendMail(options[0]).catch(error => {
-      console.log(`${process.env.EMAIL_USERNAME} - ${error.message}`);
-      transporters[1].sendMail(options[1]).catch(error => {
-        console.log(`${process.env.EMAIL_USERNAME_2} - ${error.message}`);
-        transporters[2].sendMail(options[2]).catch(error => {
-          console.log(`${process.env.EMAIL_USERNAME_3} - ${error.message}`);
-        });
+    transporters[0]
+      .sendMail(options[0])
+      .then(info => {
+        console.log(`Message sent: ${process.env.EMAIL_USERNAME} ${info.messageId}`);
+      })
+      .catch(error => {
+        console.log(`${process.env.EMAIL_USERNAME} - ${error.message}`);
+        transporters[1]
+          .sendMail(options[1])
+          .then(info => {
+            console.log(`Message sent: ${process.env.EMAIL_USERNAME_2} ${info.messageId}`);
+          })
+          .catch(error => {
+            console.log(`${process.env.EMAIL_USERNAME_2} - ${error.message}`);
+            transporters[2]
+              .sendMail(options[2])
+              .then(info => {
+                console.log(`Message sent: ${process.env.EMAIL_USERNAME_3} ${info.messageId}`);
+              })
+              .catch(error => {
+                console.log(`${process.env.EMAIL_USERNAME_3} - ${error.message}`);
+              });
+          });
       });
-    });
   }
 }
