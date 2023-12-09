@@ -6,6 +6,7 @@ import {
   AuthenticationFailedException,
   DatabaseOperationFailException,
   EntityNotFoundException,
+  OperationFailException,
   PasswordChangeFailedException,
   SendEmailFailException
 } from '../../src/exception';
@@ -29,12 +30,11 @@ describe('AuthService', () => {
       const { email, password } = generate.loginInput();
       const userDTO: IUserPostRequest = { email, password };
       const user: User = generate.userData();
-      user.loginCount += 1;
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
       const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
       const spyUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
-      const spyGetActiveGame = jest.spyOn(gameRepository, 'getActiveGameByUser').mockResolvedValue(generate.newGame());
+      const spyGetActiveGame = jest.spyOn(gameRepository, 'getActiveGameByUser').mockResolvedValue(generate.gameData());
       const spyGenerate = jest.spyOn(JwtService, 'generateToken').mockReturnValue(generate.encodedJwt());
 
       const result: LoginResponseDTO = await authService.login(userDTO);
@@ -42,7 +42,7 @@ describe('AuthService', () => {
       expect(result).toEqual(generate.loginResponse());
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
       expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
-      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount++ });
       expect(spyGetActiveGame).toHaveBeenCalledWith(user);
       expect(spyGenerate).toHaveBeenCalledWith({ id: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, '1h');
     });
@@ -51,7 +51,6 @@ describe('AuthService', () => {
       const { email, password } = generate.loginInput();
       const userDTO: IUserPostRequest = { email, password };
       const user: User = generate.userData();
-      user.loginCount += 1;
       const loginResponse: LoginResponseDTO = generate.loginResponse();
       loginResponse.game = null;
 
@@ -66,7 +65,7 @@ describe('AuthService', () => {
       expect(result).toEqual(loginResponse);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
       expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
-      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount++ });
       expect(spyGetActiveGame).toHaveBeenCalledWith(user);
       expect(spyGenerate).toHaveBeenCalledWith({ id: user.id, email: user.email }, process.env.ACCESS_TOKEN_SECRET, '1h');
     });
@@ -122,7 +121,6 @@ describe('AuthService', () => {
       const { email, password } = generate.loginInput();
       const userDTO: IUserPostRequest = { email, password };
       const user: User = generate.userData();
-      user.loginCount += 1;
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
       const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
@@ -133,14 +131,13 @@ describe('AuthService', () => {
       await expect(authService.login(userDTO)).rejects.toThrow(DatabaseOperationFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
       expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
-      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount++ });
     });
 
     it('should throw DatabaseOperationFailException if the database operation fails finding active game', async () => {
       const { email, password } = generate.loginInput();
       const userDTO: IUserPostRequest = { email, password };
       const user: User = generate.userData();
-      user.loginCount += 1;
 
       const spyGetByEmail = jest.spyOn(userRepository, 'getByEmail').mockResolvedValue(user);
       const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
@@ -152,7 +149,7 @@ describe('AuthService', () => {
       await expect(authService.login(userDTO)).rejects.toThrow(DatabaseOperationFailException);
       expect(spyGetByEmail).toHaveBeenCalledWith(userDTO.email);
       expect(spyCompare).toHaveBeenCalledWith(userDTO.password, user.password);
-      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount });
+      expect(spyUpdate).toHaveBeenCalledWith(user.id, { loginCount: user.loginCount++ });
       expect(spyGetActiveGame).toHaveBeenCalledWith(user);
     });
   });
@@ -176,9 +173,9 @@ describe('AuthService', () => {
 
       expect(spyGetByEmail).toHaveBeenCalledWith(input.email);
       expect(spyFindById).toHaveBeenCalledWith(user.id);
-      expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
+      expect(spyDeleteById).toHaveBeenCalledWith(user.id);
       expect(spyEncrypt).toHaveBeenCalled();
-      expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
+      expect(spyCreate).toHaveBeenCalledWith({ user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);
       expect(spySendEmail).toHaveBeenCalled();
     });
@@ -270,7 +267,7 @@ describe('AuthService', () => {
       expect(spyFindById).toHaveBeenCalledWith(user.id);
       expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
-      expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
+      expect(spyCreate).toHaveBeenCalledWith({ user, token: token.token });
     });
 
     it('should throw DatabaseOperationFailException if operation fails while saving token', async () => {
@@ -293,7 +290,7 @@ describe('AuthService', () => {
       expect(spyFindById).toHaveBeenCalledWith(user.id);
       expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
-      expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
+      expect(spyCreate).toHaveBeenCalledWith({ user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);
     });
 
@@ -318,7 +315,7 @@ describe('AuthService', () => {
       expect(spyFindById).toHaveBeenCalledWith(user.id);
       expect(spyDeleteById).toHaveBeenCalledWith(expiredToken.id);
       expect(spyEncrypt).toHaveBeenCalled();
-      expect(spyCreate).toHaveBeenCalledWith({ user: token.user, token: token.token });
+      expect(spyCreate).toHaveBeenCalledWith({ user, token: token.token });
       expect(spySave).toHaveBeenCalledWith(token);
       expect(spySendEmail).toHaveBeenCalled();
     });
@@ -427,6 +424,92 @@ describe('AuthService', () => {
       expect(spyEncrypt).toHaveBeenCalled();
       expect(spyUpdate).toHaveBeenCalledWith(input.id, { password: hashed });
       expect(spyDeleteById).toHaveBeenCalledWith(input.id);
+    });
+  });
+
+  describe('confirmEmail', () => {
+    it('should confirm user email if token is valid', async () => {
+      const input = generate.confirmEmailInput();
+      const token: Token = generate.tokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyUserUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockResolvedValue();
+
+      await authService.confirmEmail(input.id, input.token);
+
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+      expect(spyUserUpdate).toHaveBeenCalledWith(input.id, { isActive: true });
+      expect(spyDeleteById).toHaveBeenCalledWith(input.id);
+    });
+
+    it('should throw DatabaseOperationFailException if fails deleting token', async () => {
+      const input = generate.confirmEmailInput();
+      const token: Token = generate.tokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyUserUpdate = jest.spyOn(userRepository, 'update').mockResolvedValue(new UpdateResult());
+      const spyDeleteById = jest.spyOn(tokenRepository, 'deleteById').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(authService.confirmEmail(input.id, input.token)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+      expect(spyUserUpdate).toHaveBeenCalledWith(input.id, { isActive: true });
+      expect(spyDeleteById).toHaveBeenCalledWith(input.id);
+    });
+
+    it('should throw DatabaseOperationFailException if fails updating user', async () => {
+      const input = generate.confirmEmailInput();
+      const token: Token = generate.tokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+      const spyUserUpdate = jest.spyOn(userRepository, 'update').mockImplementation(() => {
+        throw new DatabaseOperationFailException();
+      });
+
+      await expect(authService.confirmEmail(input.id, input.token)).rejects.toThrow(DatabaseOperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+      expect(spyUserUpdate).toHaveBeenCalledWith(input.id, { isActive: true });
+    });
+
+    it('should throw OperationFailException if tokens do not match', async () => {
+      const input = generate.confirmEmailInput();
+      const token: Token = generate.tokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(false);
+
+      await expect(authService.confirmEmail(input.id, input.token)).rejects.toThrow(OperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+    });
+
+    it('should throw OperationFailException if token is not valid', async () => {
+      const input = generate.confirmEmailInput();
+      const token: Token = generate.expiredTokenData();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(token);
+      const spyCompare = jest.spyOn(PasswordEncrypt, 'compare').mockResolvedValue(true);
+
+      await expect(authService.confirmEmail(input.id, input.token)).rejects.toThrow(OperationFailException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
+      expect(spyCompare).toHaveBeenCalledWith(input.token, token.token);
+    });
+
+    it('should throw EntityNotFoundException if token was not found', async () => {
+      const input = generate.confirmEmailInput();
+
+      const spyFindById = jest.spyOn(tokenRepository, 'findById').mockResolvedValue(null);
+
+      await expect(authService.confirmEmail(input.id, input.token)).rejects.toThrow(EntityNotFoundException);
+      expect(spyFindById).toHaveBeenCalledWith(input.id);
     });
   });
 });
