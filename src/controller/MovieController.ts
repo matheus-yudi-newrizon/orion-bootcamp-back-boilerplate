@@ -158,16 +158,15 @@ export class MovieController {
    *               success: false
    *               message: 'DatabaseOperationFailException. Unsuccessful database operation.'
    */
-  public async getMovieByReview(req: Request, res: Response): Promise<void> {
+  public async getMovieByUser(req: Request, res: Response): Promise<void> {
     try {
       const jwtPayload: JwtPayload = (req as ICustomRequest).token;
-      const { reviewText, keyword } = req.body;
+      const { keyword } = req.body;
 
-      if (!reviewText) throw new RequiredFieldException('reviewText');
       if (!keyword) throw new RequiredFieldException('keyword');
       if (keyword !== process.env.MOVIE_REVIEW_KEYWORD) throw new OperationFailException('The keyword is not valid.');
 
-      const movie: MovieDTO = await this.movieService.getMovieByReview(jwtPayload.id, reviewText);
+      const movie: MovieDTO = await this.movieService.getMovieByUser(jwtPayload.id);
       const result: IControllerResponse<MovieDTO> = {
         success: true,
         message: 'Found movie by review successfully.',

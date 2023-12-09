@@ -37,24 +37,23 @@ export class MovieService {
   }
 
   /**
-   * Retrieves a movie based on a given review text.
+   * Retrieves a movie based on a given user.
    *
    * @param userId - The id of the user.
-   * @param reviewText - The text of the review associated with the movie.
    *
    * @returns A promise that resolves with the movie.
    * @throws {EntityNotFoundException} if the user, game or movie was not found in database.
    * @throws {DatabaseOperationFailException} if the database operation fails.
    */
-  public async getMovieByReview(userId: number, reviewText: string): Promise<MovieDTO> {
+  public async getMovieByUser(userId: number): Promise<MovieDTO> {
     const user: User = await this.userRepository.getById(userId);
     if (!user) throw new EntityNotFoundException('user');
 
     const game: Game = await this.gameRepository.getActiveGameByUser(user);
     if (!game) throw new EntityNotFoundException('game');
 
-    const movie: Movie = await this.movieRepository.getMovieByReview(reviewText);
-    if (!movie) throw new EntityNotFoundException('movie');
+    if (!game.currentGameReview) throw new EntityNotFoundException('movie');
+    const movie: Movie = game.currentGameReview.review.movie;
 
     return new MovieDTO(movie);
   }
