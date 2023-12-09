@@ -106,7 +106,7 @@ export class MovieController {
   /**
    * @swagger
    * /movies/answer:
-   *   post:
+   *   get:
    *     tags:
    *       - movies
    *     summary: Get movie details by review
@@ -140,10 +140,6 @@ export class MovieController {
    *             schema:
    *               $ref: '#/components/schemas/ApiResponse'
    *             examples:
-   *               RequiredFieldException:
-   *                 value:
-   *                   success: false
-   *                   message: 'RequiredFieldException. Required field: reviewText.'
    *               EntityNotFoundException:
    *                 value:
    *                   success: false
