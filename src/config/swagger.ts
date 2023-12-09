@@ -21,7 +21,7 @@ export const swaggerConfig: swaggerJSDoc.OAS3Options = {
       { name: 'auth', description: 'Authentication operations for users' },
       { name: 'games', description: 'Everything about your games' },
       { name: 'movies', description: 'Access to movies data' },
-      { name: 'reviews', description: 'Acess to movie reviews' }
+      { name: 'reviews', description: 'Access to movie reviews' }
     ],
     components: {
       schemas: {
