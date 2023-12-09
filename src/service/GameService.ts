@@ -32,7 +32,7 @@ export class GameService {
 
     await this.userRepository.update(user.id, { playCount: ++user.playCount });
 
-    const game: Game = this.gameRepository.create({ user: user, lives: 2, score: 0, combo: 0, isActive: true });
+    const game: Game = this.gameRepository.create({ user, lives: 2, score: 0, combo: 0, isActive: true });
     await this.gameRepository.save(game);
 
     return new GameResponseDTO(game, user);
