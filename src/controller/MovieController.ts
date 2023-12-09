@@ -112,12 +112,12 @@ export class MovieController {
    *     summary: Get movie details by review
    *     security:
    *       - bearerAuth: []
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/MovieReviewRequest'
+   *     parameters:
+   *       - in: query
+   *         name: keyword
+   *         schema:
+   *           type: string
+   *           description: The keyword
    *     responses:
    *       '200':
    *         description: Return movie details by review
@@ -157,7 +157,7 @@ export class MovieController {
   public async getMovieByUser(req: Request, res: Response): Promise<void> {
     try {
       const jwtPayload: JwtPayload = (req as ICustomRequest).token;
-      const { keyword } = req.body;
+      const keyword: string = req.query['keyword'] as string;
 
       if (!keyword) throw new RequiredFieldException('keyword');
       if (keyword !== process.env.MOVIE_REVIEW_KEYWORD) throw new OperationFailException('The keyword is not valid.');
