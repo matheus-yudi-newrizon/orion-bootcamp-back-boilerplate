@@ -2,9 +2,8 @@ import fs from 'fs';
 import handlebars from 'handlebars';
 import nodemailer, { Transporter } from 'nodemailer';
 import path from 'path';
-import { Generate } from '../mocks/Generate';
 import { EmailService } from '../../src/utils/EmailService';
-import { SendEmailFailException } from '../../src/exception';
+import { Generate } from '../mocks/Generate';
 
 const generate = new Generate();
 
@@ -44,16 +43,14 @@ describe('EmailService', () => {
       expect(transporter.sendMail).toHaveBeenCalled();
     });
 
-    it('should throw SendEmailFailException if fails sending email', async () => {
+    it('should do nothing if fails sending email', async () => {
       const email = generate.userData().email;
       const payload = { username: email.slice(0, email.indexOf('@')), link: 'https://www.example.com' };
       const template = './path/to/thing';
 
       const transporter: Partial<Transporter> = {
         verify: jest.fn(),
-        sendMail: jest.fn().mockImplementation(() => {
-          throw new SendEmailFailException('Failed.');
-        })
+        sendMail: jest.fn()
       };
       const source: string = '';
       const compiledTemplate = jest.fn();
@@ -63,7 +60,8 @@ describe('EmailService', () => {
       const spyReadFile = jest.spyOn(fs, 'readFileSync').mockReturnValue(source);
       const spyCompile = jest.spyOn(handlebars, 'compile').mockReturnValue(compiledTemplate);
 
-      await expect(EmailService.sendEmail(email, 'Test Email', payload, template)).rejects.toThrow(SendEmailFailException);
+      await EmailService.sendEmail(email, 'Test Email', payload, template);
+
       expect(spyCreateTransport).toHaveBeenCalledWith({
         service: process.env.EMAIL_SERVICE,
         auth: {
@@ -79,15 +77,14 @@ describe('EmailService', () => {
       expect(transporter.sendMail).toHaveBeenCalled();
     });
 
-    it('should throw SendEmailFailException if fails verifying email', async () => {
+    it('should do nothing if fails verifying email', async () => {
       const email = generate.userData().email;
       const payload = { username: email.slice(0, email.indexOf('@')), link: 'https://www.example.com' };
       const template = './path/to/thing';
 
       const transporter: Partial<Transporter> = {
-        verify: jest.fn().mockImplementation(() => {
-          throw new SendEmailFailException('Failed.');
-        })
+        verify: jest.fn(),
+        sendMail: jest.fn()
       };
       const source: string = '';
       const compiledTemplate = jest.fn();
@@ -97,7 +94,8 @@ describe('EmailService', () => {
       const spyReadFile = jest.spyOn(fs, 'readFileSync').mockReturnValue(source);
       const spyCompile = jest.spyOn(handlebars, 'compile').mockReturnValue(compiledTemplate);
 
-      await expect(EmailService.sendEmail(email, 'Test Email', payload, template)).rejects.toThrow(SendEmailFailException);
+      await EmailService.sendEmail(email, 'Test Email', payload, template);
+
       expect(spyCreateTransport).toHaveBeenCalledWith({
         service: process.env.EMAIL_SERVICE,
         auth: {
